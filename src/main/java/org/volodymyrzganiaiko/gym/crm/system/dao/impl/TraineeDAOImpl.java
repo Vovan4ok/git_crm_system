@@ -23,15 +23,18 @@ public class TraineeDAOImpl implements TraineeDAO {
 
 
     @Override
-    public boolean save(Trainee trainee) {
+    public Trainee save(Trainee trainee) {
         storage.put(trainee.getUserId(), trainee);
-        return true;
+        return trainee;
     }
 
     @Override
     public boolean update(Trainee trainee) {
-        storage.put(trainee.getUserId(), trainee);
-        return true;
+        if (storage.containsKey(trainee.getId())) {
+            storage.put(trainee.getUserId(), trainee);
+            return true;
+        }
+        return false;
     }
 
     @Override

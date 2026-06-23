@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface TraineeDAO {
-    boolean save(Trainee trainee);
+    Trainee save(Trainee trainee);
     boolean update(Trainee trainee);
     boolean delete(UUID traineeId);
     Optional<Trainee> findById(UUID traineeId);

@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface TrainerDAO {
-    boolean save(Trainer trainer);
+    Trainer save(Trainer trainer);
     boolean update(Trainer trainer);
     Optional<Trainer> findById(UUID trainerId);
     List<Trainer> findAll();

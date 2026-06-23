@@ -2,16 +2,16 @@ package org.volodymyrzganiaiko.gym.crm.system.domain;
 
 import java.util.UUID;
 
-public class Trainer extends User {
+public class Trainer extends User implements Identifiable {
     private TrainingType specialization;
     private UUID userId;
 
     public Trainer() {}
 
-    public Trainer(TrainingType specialization, UUID userId) {
-        this.specialization = specialization;
-        this.userId = userId;
-    }
+//    public Trainer(TrainingType specialization, UUID userId) {
+//        this.specialization = specialization;
+//        this.userId = userId;
+//    }
 
     public Trainer(String firstName, String lastName, String username, String password, boolean isActive, TrainingType specialization, UUID userId) {
         super(firstName, lastName, username, password, isActive);
@@ -36,9 +36,15 @@ public class Trainer extends User {
     }
 
     @Override
+    public UUID getId() {
+        return userId;
+    }
+
+    @Override
     public String toString() {
         return "Trainer{" +
-                "specialization=" + specialization +
+                super.toString() +
+                ", specialization=" + specialization +
                 ", userId=" + userId +
                 '}';
     }

@@ -22,15 +22,18 @@ public class TrainerDAOImpl implements TrainerDAO {
     }
 
     @Override
-    public boolean save(Trainer trainer) {
+    public Trainer save(Trainer trainer) {
         storage.put(trainer.getUserId(), trainer);
-        return true;
+        return trainer;
     }
 
     @Override
     public boolean update(Trainer trainer) {
-        storage.put(trainer.getUserId(), trainer);
-        return true;
+        if (storage.containsKey(trainer.getId())) {
+            storage.put(trainer.getUserId(), trainer);
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public class Training {
+    private UUID trainingId;
     private UUID traineeId;
     private UUID trainerId;
     private TrainingType trainingType;
@@ -13,7 +14,8 @@ public class Training {
 
     public Training() {}
 
-    public Training(UUID traineeId, UUID trainerId, TrainingType trainingType, String trainingName, LocalDate trainingDate, Integer trainingDurationInMinutes) {
+    public Training(UUID trainingId, UUID traineeId, UUID trainerId, TrainingType trainingType, String trainingName, LocalDate trainingDate, Integer trainingDurationInMinutes) {
+        this.trainingId = trainingId;
         this.traineeId = traineeId;
         this.trainerId = trainerId;
         this.trainingType = trainingType;
@@ -21,6 +23,10 @@ public class Training {
         this.trainingDate = trainingDate;
         this.trainingDurationInMinutes = trainingDurationInMinutes;
     }
+
+    public UUID getTrainingId() { return trainingId; }
+
+    public void setTrainingId(UUID trainingId) { this.trainingId = trainingId; }
 
     public UUID getTraineeId() {
         return traineeId;
@@ -73,7 +79,8 @@ public class Training {
     @Override
     public String toString() {
         return "Training{" +
-                "traineeId=" + traineeId +
+                "trainingId=" + trainingId +
+                ", traineeId=" + traineeId +
                 ", trainerId=" + trainerId +
                 ", trainingType=" + trainingType +
                 ", trainingName='" + trainingName + '\'' +

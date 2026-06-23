@@ -1,6 +1,7 @@
 package org.volodymyrzganiaiko.gym.crm.system.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Configuration
+@ComponentScan(basePackages = "org.volodymyrzganiaiko.gym.crm.system")
 public class AppConfig {
 
     @Bean

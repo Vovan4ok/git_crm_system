@@ -5,12 +5,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.volodymyrzganiaiko.gym.crm.system.dao.impl.TraineeDAOImpl;
-import org.volodymyrzganiaiko.gym.crm.system.dao.impl.TrainerDAOImpl;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Training;
-import org.volodymyrzganiaiko.gym.crm.system.utils.CredentialsGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +34,4 @@ public class AppConfig {
 
     @Bean
     public Map<UUID, Training> trainingStorage() { return new HashMap<>(); }
-
-    @Bean
-    public CredentialsGenerator credentialsGenerator() { return new CredentialsGenerator(new TraineeDAOImpl(), new TrainerDAOImpl()); }
 }

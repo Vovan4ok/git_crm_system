@@ -8,11 +8,6 @@ public class Trainer extends User implements Identifiable {
 
     public Trainer() {}
 
-//    public Trainer(TrainingType specialization, UUID userId) {
-//        this.specialization = specialization;
-//        this.userId = userId;
-//    }
-
     public Trainer(String firstName, String lastName, String username, String password, boolean isActive, TrainingType specialization, UUID userId) {
         super(firstName, lastName, username, password, isActive);
         this.specialization = specialization;

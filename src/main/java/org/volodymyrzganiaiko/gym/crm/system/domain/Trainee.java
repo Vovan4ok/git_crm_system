@@ -10,12 +10,6 @@ public class Trainee extends User implements Identifiable {
 
     public Trainee() {}
 
-//    public Trainee(LocalDate dateOfBirth, String address, UUID userId) {
-//        this.dateOfBirth = dateOfBirth;
-//        this.address = address;
-//        this.userId = userId;
-//    }
-
     public Trainee(String firstName, String lastName, String username, String password, boolean isActive, LocalDate dateOfBirth, String address, UUID userId) {
         super(firstName, lastName, username, password, isActive);
         this.dateOfBirth = dateOfBirth;

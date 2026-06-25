@@ -59,6 +59,7 @@ public class Main {
             training.setTrainingDate(LocalDate.parse("2026-06-24"));
             training.setTrainingType(trainer.getSpecialization());
             training.setTrainingDurationInMinutes(90);
+
             System.out.println(gymFacade.findAllTrainings().size());
             training = gymFacade.createTraining(training);
             System.out.println(gymFacade.findAllTrainings().size());

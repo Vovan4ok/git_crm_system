@@ -15,14 +15,18 @@ import java.util.UUID;
 
 @Service
 public class TraineeServiceImpl implements TraineeService {
-    private final TraineeDAO traineeDAO;
-    private final CredentialsService credentialsService;
+    private TraineeDAO traineeDAO;
+    private CredentialsService credentialsService;
 
     private static final Logger log =  LoggerFactory.getLogger(TraineeServiceImpl.class);
 
     @Autowired
-    public TraineeServiceImpl(TraineeDAO traineeDAO, CredentialsService credentialsService) {
+    public void setTraineeDAO(TraineeDAO traineeDAO) {
         this.traineeDAO = traineeDAO;
+    }
+
+    @Autowired
+    public void setCredentialsService(CredentialsService credentialsService) {
         this.credentialsService = credentialsService;
     }
 

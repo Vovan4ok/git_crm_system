@@ -31,7 +31,10 @@ public class CredentialsServiceTest {
 
     @BeforeEach
     public void initCredentialsService() {
-        credentialsService = new CredentialsService(traineeDAO, trainerDAO, new CredentialsGenerator());
+        credentialsService = new CredentialsService();
+        credentialsService.setTraineeDAO(traineeDAO);
+        credentialsService.setTrainerDAO(trainerDAO);
+        credentialsService.setCredentialsGenerator(new CredentialsGenerator());
     }
 
     @Test

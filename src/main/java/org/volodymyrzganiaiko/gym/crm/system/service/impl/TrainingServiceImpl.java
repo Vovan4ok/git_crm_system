@@ -14,12 +14,12 @@ import java.util.UUID;
 
 @Service
 public class TrainingServiceImpl implements TrainingService {
-    private final TrainingDAO trainingDAO;
+    private TrainingDAO trainingDAO;
 
     private static final Logger log = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
     @Autowired
-    public TrainingServiceImpl(TrainingDAO trainingDAO) {
+    public void setTrainingDAO(TrainingDAO trainingDAO) {
         this.trainingDAO = trainingDAO;
     }
 

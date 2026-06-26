@@ -13,14 +13,22 @@ import java.util.stream.Stream;
 
 @Service
 public class CredentialsService {
-    private final TraineeDAO traineeDAO;
-    private final TrainerDAO trainerDAO;
-    private final CredentialsGenerator credentialsGenerator;
+    private TraineeDAO traineeDAO;
+    private TrainerDAO trainerDAO;
+    private CredentialsGenerator credentialsGenerator;
 
     @Autowired
-    public CredentialsService(TraineeDAO traineeDAO, TrainerDAO trainerDAO, CredentialsGenerator credentialsGenerator) {
+    public void setTraineeDAO (TraineeDAO traineeDAO) {
         this.traineeDAO = traineeDAO;
+    }
+
+    @Autowired
+    public void setTrainerDAO (TrainerDAO trainerDAO) {
         this.trainerDAO = trainerDAO;
+    }
+
+    @Autowired
+    public void setCredentialsGenerator (CredentialsGenerator credentialsGenerator) {
         this.credentialsGenerator = credentialsGenerator;
     }
 

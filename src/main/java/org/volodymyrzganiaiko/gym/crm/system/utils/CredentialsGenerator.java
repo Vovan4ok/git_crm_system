@@ -1,17 +1,12 @@
 package org.volodymyrzganiaiko.gym.crm.system.utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
-import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class CredentialsGenerator {
@@ -19,26 +14,17 @@ public class CredentialsGenerator {
     private static final short PASSWORD_LENGTH = 10;
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final Logger log = LoggerFactory.getLogger(CredentialsGenerator.class);
-    private final TraineeDAO traineeDAO;
-    private final TrainerDAO trainerDAO;
 
-    @Autowired
-    public CredentialsGenerator(TraineeDAO traineeDAO, TrainerDAO trainerDAO) {
-        this.trainerDAO = trainerDAO;
-        this.traineeDAO = traineeDAO;
-    }
-
-    public String generateUsername(User user) {
-        Set<String> usernames = Stream.concat(traineeDAO.findAll().stream(), trainerDAO.findAll().stream()).map(User::getUsername).collect(Collectors.toSet());
+    public String generateUsername(User user, Set<String> existingUsernames) {
         log.debug("Generating username for user {}", user.getUserId());
         String requiredUsername = user.getFirstName() + "." + user.getLastName();
-        if (!usernames.contains(requiredUsername)) {
+        if (!existingUsernames.contains(requiredUsername)) {
             return requiredUsername;
         } else {
             int count = 1;
             while (true) {
                 String base = requiredUsername + "." + count;
-                if (!usernames.contains(base)) {
+                if (!existingUsernames.contains(base)) {
                     return base;
                 }
                 count++;

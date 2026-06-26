@@ -1,6 +1,8 @@
 package org.volodymyrzganiaiko.gym.crm.system;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,82 +17,59 @@ import org.volodymyrzganiaiko.gym.crm.system.domain.User;
 import org.volodymyrzganiaiko.gym.crm.system.utils.CredentialsGenerator;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class CredentialsGeneratorTest {
-    @Mock
-    TraineeDAO traineeDAO;
-
-    @Mock
-    TrainerDAO trainerDAO;
-
-    @InjectMocks
     CredentialsGenerator credentialsGenerator;
+
+    @BeforeEach
+    public void initCredentialsGenerator() {
+        credentialsGenerator = new CredentialsGenerator();
+    }
 
     @Test
     public void testGenerateUsernameWithoutCollisions() {
-        when(traineeDAO.findAll()).thenReturn(new ArrayList<>());
-        when(trainerDAO.findAll()).thenReturn(new ArrayList<>());
-        User user = new User();
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setUsername(credentialsGenerator.generateUsername(user));
-        verify(traineeDAO).findAll();
-        verify(trainerDAO).findAll();
-        assertEquals("John.Doe", user.getUsername());
+        User input = new User();
+        input.setFirstName("John");
+        input.setLastName("Doe");
+        String expected = "John.Doe";
+        Set<String> existingUsernames = new HashSet<>();
+
+        String result = credentialsGenerator.generateUsername(input, existingUsernames);
+
+        assertEquals(expected, result);
     }
 
     @Test
     public void testGenerateUsernameWithCollisions() {
-        List<Trainee> trainees = new ArrayList<>();
-        trainees.add(new Trainee("John", "Doe", "John.Doe", "random", true, LocalDate.parse("2003-08-11"), "Test address", UUID.randomUUID()));
-        when(traineeDAO.findAll()).thenReturn(trainees);
-        when(trainerDAO.findAll()).thenReturn(new ArrayList<>());
-        Trainee trainee = new Trainee();
-        trainee.setFirstName("John");
-        trainee.setLastName("Doe");
-        trainee.setUsername(credentialsGenerator.generateUsername(trainee));
-        verify(traineeDAO).findAll();
-        verify(trainerDAO).findAll();
-        assertEquals("John.Doe.1", trainee.getUsername());
+        User input = new User();
+        input.setFirstName("John");
+        input.setLastName("Doe");
+        String expected = "John.Doe.1";
+        Set<String> existingUsernames = Set.of("John.Doe");
+
+        String result = credentialsGenerator.generateUsername(input, existingUsernames);
+
+        assertEquals(expected, result);
     }
 
     @Test
     public void testGenerateUsernameWithCrossCollisions() {
-        List<Trainee> trainees = new ArrayList<>();
-        trainees.add(new Trainee("John", "Doe", "John.Doe", "random", true, LocalDate.parse("2003-08-11"), "Test address", UUID.randomUUID()));
-        when(traineeDAO.findAll()).thenReturn(trainees);
-        when(trainerDAO.findAll()).thenReturn(new ArrayList<>());
-        Trainer trainer = new Trainer();
-        trainer.setFirstName("John");
-        trainer.setLastName("Doe");
-        trainer.setUsername(credentialsGenerator.generateUsername(trainer));
-        verify(traineeDAO).findAll();
-        verify(trainerDAO).findAll();
-        assertEquals("John.Doe.1", trainer.getUsername());
-    }
+        User input = new User();
+        input.setFirstName("John");
+        input.setLastName("Doe");
+        String expected = "John.Doe.2";
+        Set<String> existingUsernames = Set.of("John.Doe", "John.Doe.1");
 
-    @Test
-    public void testGenerateUsernameWithMultipleCollision() {
-        List<Trainee> trainees = new ArrayList<>();
-        trainees.add(new Trainee("John", "Doe", "John.Doe", "random", true, LocalDate.parse("2003-08-11"), "Test address", UUID.randomUUID()));
-        List<Trainer> trainers = new ArrayList<>();
-        trainers.add(new Trainer("John", "Doe", "John.Doe.1", "random", true, new TrainingType("Joga"), UUID.randomUUID()));
-        when(traineeDAO.findAll()).thenReturn(trainees);
-        when(trainerDAO.findAll()).thenReturn(trainers);
-        Trainer trainer = new Trainer();
-        trainer.setFirstName("John");
-        trainer.setLastName("Doe");
-        trainer.setUsername(credentialsGenerator.generateUsername(trainer));
-        verify(traineeDAO).findAll();
-        verify(trainerDAO).findAll();
-        assertEquals("John.Doe.2", trainer.getUsername());
+        String result = credentialsGenerator.generateUsername(input, existingUsernames);
+
+        assertEquals(expected, result);
     }
 
     @Test

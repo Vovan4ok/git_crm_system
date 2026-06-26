@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
+import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TraineeService;
-import org.volodymyrzganiaiko.gym.crm.system.utils.CredentialsGenerator;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,22 +16,22 @@ import java.util.UUID;
 @Service
 public class TraineeServiceImpl implements TraineeService {
     private final TraineeDAO traineeDAO;
-    private final CredentialsGenerator credentialsGenerator;
+    private final CredentialsService credentialsService;
 
     private static final Logger log =  LoggerFactory.getLogger(TraineeServiceImpl.class);
 
     @Autowired
-    public TraineeServiceImpl(TraineeDAO traineeDAO, CredentialsGenerator credentialsGenerator) {
+    public TraineeServiceImpl(TraineeDAO traineeDAO, CredentialsService credentialsService) {
         this.traineeDAO = traineeDAO;
-        this.credentialsGenerator = credentialsGenerator;
+        this.credentialsService = credentialsService;
     }
 
     @Override
     public Trainee create(Trainee trainee) {
         trainee.setUserId(UUID.randomUUID());
         trainee.setActive(true);
-        trainee.setUsername(credentialsGenerator.generateUsername(trainee));
-        trainee.setPassword(credentialsGenerator.generatePassword());
+        trainee.setUsername(credentialsService.generateUsername(trainee));
+        trainee.setPassword(credentialsService.generatePassword());
         log.info("Creating a trainee record with id {}", trainee.getUserId());
         return traineeDAO.save(trainee);
     }

@@ -12,8 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
+import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
 import org.volodymyrzganiaiko.gym.crm.system.service.impl.TrainerServiceImpl;
-import org.volodymyrzganiaiko.gym.crm.system.utils.CredentialsGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @ExtendWith(MockitoExtension.class)
 public class TrainerServiceTest {
     @Mock
-    CredentialsGenerator credentialsGenerator;
+    CredentialsService credentialsService;
     
     @Mock
     TrainerDAO trainerDAO;
@@ -38,12 +38,12 @@ public class TrainerServiceTest {
         trainer.setLastName("Doe");
         trainer.setSpecialization(new TrainingType("Joga"));
         when(trainerDAO.save(trainer)).thenReturn(trainer);
-        when(credentialsGenerator.generateUsername(trainer)).thenReturn("John.Doe");
-        when(credentialsGenerator.generatePassword()).thenReturn(UUID.randomUUID().toString());
+        when(credentialsService.generateUsername(trainer)).thenReturn("John.Doe");
+        when(credentialsService.generatePassword()).thenReturn(UUID.randomUUID().toString());
         trainer = trainerService.create(trainer);
         verify(trainerDAO).save(trainer);
-        verify(credentialsGenerator).generateUsername(trainer);
-        verify(credentialsGenerator).generatePassword();
+        verify(credentialsService).generateUsername(trainer);
+        verify(credentialsService).generatePassword();
         assertNotNull(trainer.getUserId());
         assertNotNull(trainer.getUsername());
         assertNotNull(trainer.getPassword());
@@ -70,7 +70,7 @@ public class TrainerServiceTest {
     }
 
     @Test
-    public void testFindtrainer() {
+    public void testFindTrainer() {
         Trainer trainer = new Trainer("John", "Doe", "John.Doe", "random", true, new TrainingType("Joga"), UUID.randomUUID());
         when(trainerDAO.findById(trainer.getUserId())).thenReturn(Optional.of(trainer));
         Optional<Trainer> trainerFound = trainerService.findById(trainer.getUserId());
@@ -80,7 +80,7 @@ public class TrainerServiceTest {
     }
 
     @Test
-    public void testFindtrainerNotFound() {
+    public void testFindTrainerNotFound() {
         UUID id = UUID.randomUUID();
         assertFalse(trainerService.findById(id).isPresent());
         verify(trainerDAO).findById(id);

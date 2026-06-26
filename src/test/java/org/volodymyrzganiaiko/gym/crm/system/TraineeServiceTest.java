@@ -8,8 +8,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
+import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
 import org.volodymyrzganiaiko.gym.crm.system.service.impl.TraineeServiceImpl;
-import org.volodymyrzganiaiko.gym.crm.system.utils.CredentialsGenerator;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class TraineeServiceTest {
     @Mock
-    CredentialsGenerator credentialsGenerator;
+    CredentialsService credentialsService;
 
     @Mock
     TraineeDAO traineeDAO;
@@ -38,13 +38,13 @@ public class TraineeServiceTest {
         trainee.setLastName("Doe");
         trainee.setDateOfBirth(LocalDate.parse("2003-11-08"));
         trainee.setAddress("Test address");
-        when(credentialsGenerator.generateUsername(trainee)).thenReturn("John.Doe");
-        when(credentialsGenerator.generatePassword()).thenReturn(UUID.randomUUID().toString());
+        when(credentialsService.generateUsername(trainee)).thenReturn("John.Doe");
+        when(credentialsService.generatePassword()).thenReturn(UUID.randomUUID().toString());
         when(traineeDAO.save(trainee)).thenAnswer(inv -> inv.getArgument(0));
         trainee = traineeService.create(trainee);
         verify(traineeDAO).save(trainee);
-        verify(credentialsGenerator).generateUsername(trainee);
-        verify(credentialsGenerator).generatePassword();
+        verify(credentialsService).generateUsername(trainee);
+        verify(credentialsService).generatePassword();
         assertNotNull(trainee.getUserId());
         assertNotNull(trainee.getUsername());
         assertNotNull(trainee.getPassword());

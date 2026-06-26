@@ -1,4 +1,4 @@
-package org.volodymyrzganiaiko.gym.crm.system;
+package org.volodymyrzganiaiko.gym.crm.system.facade;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Training;
-import org.volodymyrzganiaiko.gym.crm.system.facade.GymFacade;
 import org.volodymyrzganiaiko.gym.crm.system.service.TraineeService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainerService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainingService;

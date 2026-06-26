@@ -59,7 +59,6 @@ public class GymSystemBeanPostProcessor implements BeanPostProcessor {
                 break;
             }
             default: {
-                log.debug("Bean {} is not a storage bean, skipping", beanName);
                 break;
             }
         }

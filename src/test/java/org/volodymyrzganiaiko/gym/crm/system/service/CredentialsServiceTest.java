@@ -1,4 +1,4 @@
-package org.volodymyrzganiaiko.gym.crm.system;
+package org.volodymyrzganiaiko.gym.crm.system.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,6 @@ import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
-import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
 import org.volodymyrzganiaiko.gym.crm.system.utils.CredentialsGenerator;
 
 import java.time.LocalDate;

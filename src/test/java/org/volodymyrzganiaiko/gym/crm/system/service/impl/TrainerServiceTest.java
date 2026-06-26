@@ -1,4 +1,4 @@
-package org.volodymyrzganiaiko.gym.crm.system;
+package org.volodymyrzganiaiko.gym.crm.system.service.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,7 +13,6 @@ import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
 import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
-import org.volodymyrzganiaiko.gym.crm.system.service.impl.TrainerServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;

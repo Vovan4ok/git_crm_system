@@ -1,4 +1,4 @@
-package org.volodymyrzganiaiko.gym.crm.system;
+package org.volodymyrzganiaiko.gym.crm.system.service.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
-import org.volodymyrzganiaiko.gym.crm.system.service.impl.TraineeServiceImpl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

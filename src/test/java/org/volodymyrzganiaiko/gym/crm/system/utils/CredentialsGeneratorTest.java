@@ -1,29 +1,15 @@
-package org.volodymyrzganiaiko.gym.crm.system;
+package org.volodymyrzganiaiko.gym.crm.system.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
-import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
-import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
-import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
-import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
 import org.volodymyrzganiaiko.gym.crm.system.domain.User;
-import org.volodymyrzganiaiko.gym.crm.system.utils.CredentialsGenerator;
 
-import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class CredentialsGeneratorTest {
     CredentialsGenerator credentialsGenerator;

@@ -1,7 +1,6 @@
-package org.volodymyrzganiaiko.gym.crm.system;
+package org.volodymyrzganiaiko.gym.crm.system.config;
 
 import org.junit.jupiter.api.Test;
-import org.volodymyrzganiaiko.gym.crm.system.config.GymSystemBeanPostProcessor;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Training;

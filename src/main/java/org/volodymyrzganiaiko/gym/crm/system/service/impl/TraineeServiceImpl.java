@@ -28,20 +28,20 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee create(Trainee trainee) {
-        log.info("[TraineeService]: Creating a trainee record {}", trainee);
         trainee.setUserId(UUID.randomUUID());
         trainee.setActive(true);
         trainee.setUsername(credentialsGenerator.generateUsername(trainee));
         trainee.setPassword(credentialsGenerator.generatePassword());
+        log.info("Creating a trainee record with id {}", trainee.getUserId());
         return traineeDAO.save(trainee);
     }
 
     @Override
     public boolean update(Trainee trainee) {
-        log.info("[TraineeService]: Updating the trainee record {}", trainee);
-        Trainee traineeFromStorage = findById(trainee.getId()).orElse(null);
+        log.info("Updating the trainee record with id {}", trainee.getUserId());
+        Trainee traineeFromStorage = findById(trainee.getUserId()).orElse(null);
         if (traineeFromStorage == null) {
-            log.warn("[TraineeService]: Trainee with id {} wasn't found",  trainee.getId());
+            log.warn("Trainee with id {} wasn't found",  trainee.getUserId());
             return false;
         }
         traineeFromStorage.setDateOfBirth(trainee.getDateOfBirth());
@@ -52,19 +52,19 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public boolean delete(UUID traineeId) {
-        log.info("[TraineeService]: Deleting the trainee record with id {}", traineeId);
+        log.info("Deleting the trainee record with id {}", traineeId);
         return traineeDAO.delete(traineeId);
     }
 
     @Override
     public Optional<Trainee> findById(UUID traineeId) {
-        log.debug("[TraineeService]: Finding the trainee record with id {}", traineeId);
+        log.debug("Finding the trainee record with id {}", traineeId);
         return traineeDAO.findById(traineeId);
     }
 
     @Override
     public List<Trainee> findAll() {
-        log.debug("[TraineeService]: Finding all trainee records");
+        log.debug("Finding all trainee records");
         return traineeDAO.findAll();
     }
 }

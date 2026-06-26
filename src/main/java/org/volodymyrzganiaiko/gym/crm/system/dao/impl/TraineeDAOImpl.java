@@ -30,7 +30,7 @@ public class TraineeDAOImpl implements TraineeDAO {
 
     @Override
     public boolean update(Trainee trainee) {
-        if (storage.containsKey(trainee.getId())) {
+        if (storage.containsKey(trainee.getUserId())) {
             storage.put(trainee.getUserId(), trainee);
             return true;
         }

@@ -25,20 +25,20 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     public Training create(Training training) {
-        log.info("[TrainingService]: Creating the training record {}", training);
         training.setTrainingId(UUID.randomUUID());
+        log.info("Creating the training record with id {}", training.getTrainingId());
         return trainingDAO.save(training);
     }
 
     @Override
     public Optional<Training> findById(UUID trainingId) {
-        log.debug("[TrainingService]: Finding the training record with id{}", trainingId);
+        log.debug("Finding the training record with id {}", trainingId);
         return trainingDAO.findById(trainingId);
     }
 
     @Override
     public List<Training> findAll() {
-        log.debug("[TrainingService]: Finding all training records");
+        log.debug("Finding all training records");
         return trainingDAO.findAll();
     }
 }

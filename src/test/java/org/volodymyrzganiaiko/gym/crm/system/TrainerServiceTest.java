@@ -53,30 +53,30 @@ public class TrainerServiceTest {
     @Test
     public void  testUpdateTrainer() {
         Trainer trainer = new Trainer("John", "Doe", "John.Doe", "random", true, new TrainingType("Joga"), UUID.randomUUID());
-        when(trainerDAO.findById(trainer.getId())).thenReturn(Optional.of(trainer));
+        when(trainerDAO.findById(trainer.getUserId())).thenReturn(Optional.of(trainer));
         when(trainerDAO.update(any())).thenReturn(true);
         trainer.setSpecialization(new TrainingType("Cross-fit"));
         assertTrue(trainerService.update(trainer));
-        assertTrue(trainerService.findById(trainer.getId()).isPresent());
-        assertEquals("Cross-fit", trainerService.findById(trainer.getId()).get().getSpecialization().getTrainingTypeName());
+        assertTrue(trainerService.findById(trainer.getUserId()).isPresent());
+        assertEquals("Cross-fit", trainerService.findById(trainer.getUserId()).get().getSpecialization().getTrainingTypeName());
     }
     
     @Test
     public void testUpdateTrainerNotFound() {
         Trainer trainer = new Trainer("John", "Doe", "John.Doe", "random", true, new TrainingType("Joga"), UUID.randomUUID());
         assertFalse(trainerService.update(trainer));
-        verify(trainerDAO).findById(trainer.getId());
+        verify(trainerDAO).findById(trainer.getUserId());
         verify(trainerDAO, never()).update(any());
     }
 
     @Test
     public void testFindtrainer() {
         Trainer trainer = new Trainer("John", "Doe", "John.Doe", "random", true, new TrainingType("Joga"), UUID.randomUUID());
-        when(trainerDAO.findById(trainer.getId())).thenReturn(Optional.of(trainer));
-        Optional<Trainer> trainerFound = trainerService.findById(trainer.getId());
+        when(trainerDAO.findById(trainer.getUserId())).thenReturn(Optional.of(trainer));
+        Optional<Trainer> trainerFound = trainerService.findById(trainer.getUserId());
         assertTrue(trainerFound.isPresent());
         assertEquals("Joga", trainerFound.get().getSpecialization().getTrainingTypeName());
-        verify(trainerDAO).findById(trainer.getId());
+        verify(trainerDAO).findById(trainer.getUserId());
     }
 
     @Test

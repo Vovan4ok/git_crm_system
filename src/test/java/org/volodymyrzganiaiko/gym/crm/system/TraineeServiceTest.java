@@ -54,28 +54,28 @@ public class TraineeServiceTest {
     @Test
     public void testUpdateTrainee() {
         Trainee trainee = new Trainee("John", "Doe", "John.Doe", "random", true, LocalDate.parse("2011-09-09"), "Test address", UUID.randomUUID());
-        when(traineeDAO.findById(trainee.getId())).thenReturn(Optional.of(trainee));
+        when(traineeDAO.findById(trainee.getUserId())).thenReturn(Optional.of(trainee));
         when(traineeDAO.update(any())).thenReturn(true);
         trainee.setAddress("Test address 2");
         assertTrue(traineeService.update(trainee));
-        assertTrue(traineeService.findById(trainee.getId()).isPresent());
-        assertEquals("Test address 2", traineeService.findById(trainee.getId()).get().getAddress());
+        assertTrue(traineeService.findById(trainee.getUserId()).isPresent());
+        assertEquals("Test address 2", traineeService.findById(trainee.getUserId()).get().getAddress());
     }
 
     @Test
     public void testUpdateTraineeNotFound() {
         Trainee trainee = new Trainee("John", "Doe", "John.Doe", "random", true, LocalDate.parse("2011-09-09"), "Test address", UUID.randomUUID());
         assertFalse(traineeService.update(trainee));
-        verify(traineeDAO).findById(trainee.getId());
+        verify(traineeDAO).findById(trainee.getUserId());
         verify(traineeDAO, never()).update(any());
     }
 
     @Test
     public void testDeleteTrainee() {
         Trainee trainee = new Trainee("John", "Doe", "John.Doe", "random", true, LocalDate.parse("2011-09-09"), "Test address", UUID.randomUUID());
-        when(traineeDAO.delete(trainee.getId())).thenReturn(true);
-        assertTrue(traineeService.delete(trainee.getId()));
-        verify(traineeDAO).delete(trainee.getId());
+        when(traineeDAO.delete(trainee.getUserId())).thenReturn(true);
+        assertTrue(traineeService.delete(trainee.getUserId()));
+        verify(traineeDAO).delete(trainee.getUserId());
     }
 
     @Test
@@ -89,11 +89,11 @@ public class TraineeServiceTest {
     @Test
     public void testFindTrainee() {
         Trainee trainee = new Trainee("John", "Doe", "John.Doe", "random", true, LocalDate.parse("2011-09-09"), "Test address", UUID.randomUUID());
-        when(traineeDAO.findById(trainee.getId())).thenReturn(Optional.of(trainee));
-        Optional<Trainee> traineeFound = traineeService.findById(trainee.getId());
+        when(traineeDAO.findById(trainee.getUserId())).thenReturn(Optional.of(trainee));
+        Optional<Trainee> traineeFound = traineeService.findById(trainee.getUserId());
         assertTrue(traineeFound.isPresent());
         assertEquals("Test address", traineeFound.get().getAddress());
-        verify(traineeDAO).findById(trainee.getId());
+        verify(traineeDAO).findById(trainee.getUserId());
     }
 
     @Test

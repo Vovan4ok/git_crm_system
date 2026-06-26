@@ -28,20 +28,20 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer create(Trainer trainer) {
-        log.info("[TrainerService]: Creating the trainer record {}", trainer);
         trainer.setUserId(UUID.randomUUID());
         trainer.setActive(true);
         trainer.setUsername(credentialsGenerator.generateUsername(trainer));
         trainer.setPassword(credentialsGenerator.generatePassword());
+        log.info("Creating the trainer record with id {}", trainer.getUserId());
         return trainerDAO.save(trainer);
     }
 
     @Override
     public boolean update(Trainer trainer) {
-        log.info("[TrainerService]: Updating the trainer record with id {}", trainer.getId());
-        Trainer trainerFromStorage = findById(trainer.getId()).orElse(null);
+        log.info("Updating the trainer record with id {}", trainer.getUserId());
+        Trainer trainerFromStorage = findById(trainer.getUserId()).orElse(null);
         if (trainerFromStorage == null) {
-            log.warn("[TrainerService]: Trainer with id {} wasn't found",  trainer.getId());
+            log.warn("Trainer with id {} wasn't found",  trainer.getUserId());
             return false;
         }
         trainerFromStorage.setSpecialization(trainer.getSpecialization());
@@ -51,13 +51,13 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Optional<Trainer> findById(UUID trainerId) {
-        log.debug("[TrainerService]: Finding the trainer record with id {}", trainerId);
+        log.debug("Finding the trainer record with id {}", trainerId);
         return trainerDAO.findById(trainerId);
     }
 
     @Override
     public List<Trainer> findAll() {
-        log.debug("[TrainerService]: Finding the trainers records");
+        log.debug("Finding the trainers records");
         return trainerDAO.findAll();
     }
 }

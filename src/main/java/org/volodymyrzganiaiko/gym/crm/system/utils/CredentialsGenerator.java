@@ -30,7 +30,7 @@ public class CredentialsGenerator {
 
     public String generateUsername(User user) {
         Set<String> usernames = Stream.concat(traineeDAO.findAll().stream(), trainerDAO.findAll().stream()).map(User::getUsername).collect(Collectors.toSet());
-        log.debug("[CredentialsGenerator]: Generating username for user {}", user);
+        log.debug("Generating username for user {}", user.getUserId());
         String requiredUsername = user.getFirstName() + "." + user.getLastName();
         if (!usernames.contains(requiredUsername)) {
             return requiredUsername;
@@ -47,7 +47,7 @@ public class CredentialsGenerator {
     }
 
     public String generatePassword() {
-        log.debug("[CredentialsGenerator]: Generating password");
+        log.debug("Generating password");
         StringBuilder sb = new StringBuilder(PASSWORD_LENGTH);
         for (int i = 0; i < PASSWORD_LENGTH; i++) {
             int index = secureRandom.nextInt(ALPHABET.length());

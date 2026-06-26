@@ -47,11 +47,11 @@ public class TrainingServiceTest {
     @Test
     public void testFindTrainee() {
         Training training = new Training(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), new TrainingType("Joga"), "Joga", LocalDate.parse("2026-06-25"), 90);
-        when(trainingDAO.findById(training.getId())).thenReturn(Optional.of(training));
-        Optional<Training> trainingFound = trainingService.findById(training.getId());
+        when(trainingDAO.findById(training.getTrainingId())).thenReturn(Optional.of(training));
+        Optional<Training> trainingFound = trainingService.findById(training.getTrainingId());
         assertTrue(trainingFound.isPresent());
         assertEquals("Joga", trainingFound.get().getTrainingName());
-        verify(trainingDAO).findById(training.getId());
+        verify(trainingDAO).findById(training.getTrainingId());
     }
 
     @Test

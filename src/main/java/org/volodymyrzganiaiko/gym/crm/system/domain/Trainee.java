@@ -3,18 +3,16 @@ package org.volodymyrzganiaiko.gym.crm.system.domain;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public class Trainee extends User implements Identifiable {
+public class Trainee extends User {
     private LocalDate dateOfBirth;
     private String address;
-    private UUID userId;
 
     public Trainee() {}
 
     public Trainee(String firstName, String lastName, String username, String password, boolean isActive, LocalDate dateOfBirth, String address, UUID userId) {
-        super(firstName, lastName, username, password, isActive);
+        super(firstName, lastName, username, password, isActive, userId);
         this.dateOfBirth = dateOfBirth;
         this.address = address;
-        this.userId = userId;
     }
 
     public LocalDate getDateOfBirth() {
@@ -33,26 +31,12 @@ public class Trainee extends User implements Identifiable {
         this.address = address;
     }
 
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public UUID getId() {
-        return userId;
-    }
-
     @Override
     public String toString() {
         return "Trainee{" +
                 super.toString() +
                 ", dateOfBirth=" + dateOfBirth +
                 ", address='" + address + '\'' +
-                ", userId=" + userId +
                 '}';
     }
 }

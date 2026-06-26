@@ -29,7 +29,7 @@ public class TrainerDAOImpl implements TrainerDAO {
 
     @Override
     public boolean update(Trainer trainer) {
-        if (storage.containsKey(trainer.getId())) {
+        if (storage.containsKey(trainer.getUserId())) {
             storage.put(trainer.getUserId(), trainer);
             return true;
         }

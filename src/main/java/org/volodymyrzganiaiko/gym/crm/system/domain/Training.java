@@ -3,7 +3,7 @@ package org.volodymyrzganiaiko.gym.crm.system.domain;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public class Training implements Identifiable {
+public class Training {
     private UUID trainingId;
     private UUID traineeId;
     private UUID trainerId;
@@ -74,11 +74,6 @@ public class Training implements Identifiable {
 
     public void setTrainingDurationInMinutes(Integer trainingDurationInMinutes) {
         this.trainingDurationInMinutes = trainingDurationInMinutes;
-    }
-
-    @Override
-    public UUID getId() {
-        return trainingId;
     }
 
     @Override

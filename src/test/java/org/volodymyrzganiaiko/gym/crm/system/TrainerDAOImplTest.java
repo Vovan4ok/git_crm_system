@@ -18,7 +18,7 @@ public class TrainerDAOImplTest {
         Trainer input = new Trainer("John", "Doe", "John.Doe", "random", true, new TrainingType("Joga"), UUID.randomUUID());
         Trainer result = dao.save(input);
         assertSame(input, result);
-        assertSame(input, dao.findById(result.getId()).get());
+        assertSame(input, dao.findById(result.getUserId()).get());
     }
 
     @Test

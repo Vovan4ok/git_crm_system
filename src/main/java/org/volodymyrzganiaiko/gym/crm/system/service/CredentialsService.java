@@ -33,7 +33,7 @@ public class CredentialsService {
     }
 
     public String generateUsername(User user) {
-        Set<String> existingUsernames = Stream.concat(traineeDAO.findAll().stream(), trainerDAO.findAll().stream()).map(User::getUsername).collect(Collectors.toSet());
+        Set<String> existingUsernames = Stream.concat(traineeDAO.findAll().stream().map(t -> t.getUser().getUsername()), trainerDAO.findAll().stream().map(t -> t.getUser().getUsername())).collect(Collectors.toSet());
         return credentialsGenerator.generateUsername(user, existingUsernames);
     }
 

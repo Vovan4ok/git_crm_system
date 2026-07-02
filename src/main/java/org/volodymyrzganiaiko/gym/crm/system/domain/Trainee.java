@@ -1,40 +1,56 @@
 package org.volodymyrzganiaiko.gym.crm.system.domain;
 
-import java.time.LocalDate;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class Trainee extends User {
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "trainees")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Trainee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+
+    @Column(name = "address")
     private String address;
 
-    public Trainee() {}
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public Trainee(String firstName, String lastName, String username, String password, boolean isActive, LocalDate dateOfBirth, String address, UUID userId) {
-        super(firstName, lastName, username, password, isActive, userId);
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "trainee_trainers",
+            joinColumns = @JoinColumn(name = "trainee_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainer_id")
+    )
+    private Set<Trainer> trainers = new HashSet<>();
+
+
+    public Trainee(LocalDate dateOfBirth, String address, User user) {
         this.dateOfBirth = dateOfBirth;
         this.address = address;
-    }
-
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
+        this.user = user;
     }
 
     @Override
     public String toString() {
         return "Trainee{" +
-                super.toString() +
+                "id =" + id +
                 ", dateOfBirth=" + dateOfBirth +
                 ", address='" + address + '\'' +
                 '}';

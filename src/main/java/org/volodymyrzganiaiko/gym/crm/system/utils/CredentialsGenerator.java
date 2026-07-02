@@ -16,7 +16,7 @@ public class CredentialsGenerator {
     private static final Logger log = LoggerFactory.getLogger(CredentialsGenerator.class);
 
     public String generateUsername(User user, Set<String> existingUsernames) {
-        log.debug("Generating username for user {}", user.getUserId());
+        log.debug("Generating username for user {} {}", user.getFirstName(), user.getLastName());
         String requiredUsername = user.getFirstName() + "." + user.getLastName();
         if (!existingUsernames.contains(requiredUsername)) {
             return requiredUsername;

@@ -1,30 +1,46 @@
 package org.volodymyrzganiaiko.gym.crm.system.domain;
 
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class Trainer extends User {
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "trainers")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Trainer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "trainer_id")
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "training_type_id")
     private TrainingType specialization;
 
-    public Trainer() {}
+    @OneToOne(cascade =  CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public Trainer(String firstName, String lastName, String username, String password, boolean isActive, TrainingType specialization, UUID userId) {
-        super(firstName, lastName, username, password, isActive, userId);
+    @ManyToMany(mappedBy = "trainers")
+    private Set<Trainee> trainees = new HashSet<>();
+
+    public Trainer(TrainingType specialization, User user) {
         this.specialization = specialization;
-    }
-
-    public TrainingType getSpecialization() {
-        return specialization;
-    }
-
-    public void setSpecialization(TrainingType specialization) {
-        this.specialization = specialization;
+        this.user = user;
     }
 
     @Override
     public String toString() {
         return "Trainer{" +
-                super.toString() +
-                ", specialization=" + specialization +
+                "id=" + id +
                 '}';
     }
 }

@@ -1,4 +1,0 @@
-userId,firstName,lastName,username,password,isActive,specialization
-33333333-3333-3333-3333-333333333333,Mike,Brown,Mike.Brown,trainerpas1,true,Cross-fit
-44444444-4444-4444-4444-444444444444,Anna,Green,Anna.Green,trainerpas2,true,Joga
-not-a-uuid,Bad,Trainer,Bad.Trainer,brokenpass,true,Boxing

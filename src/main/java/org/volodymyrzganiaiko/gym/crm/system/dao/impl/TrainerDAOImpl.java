@@ -1,48 +1,61 @@
 package org.volodymyrzganiaiko.gym.crm.system.dao.impl;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public class TrainerDAOImpl implements TrainerDAO {
-    private Map<UUID, Trainer> storage;
+    private SessionFactory sessionFactory;
 
     @Autowired
-    @Qualifier("trainerStorage")
-    public void setStorage(Map<UUID, Trainer> storage) {
-        this.storage = storage;
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     @Override
     public Trainer save(Trainer trainer) {
-        storage.put(trainer.getUserId(), trainer);
+        Session session = sessionFactory.getCurrentSession();
+        session.persist(trainer);
         return trainer;
     }
 
     @Override
-    public boolean update(Trainer trainer) {
-        if (storage.containsKey(trainer.getUserId())) {
-            storage.put(trainer.getUserId(), trainer);
-            return true;
-        }
-        return false;
+    public Trainer update(Trainer trainer) {
+        Session session = sessionFactory.getCurrentSession();
+        return (Trainer) session.merge(trainer);
     }
 
     @Override
-    public Optional<Trainer> findById(UUID trainerId) {
-        return Optional.ofNullable(storage.get(trainerId));
+    public Optional<Trainer> findById(Long trainerId) {
+        Session session = sessionFactory.getCurrentSession();
+        return Optional.ofNullable(session.get(Trainer.class, trainerId));
+    }
+
+    @Override
+    public Optional<Trainer> findByUsername(String username) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createQuery("from Trainer t where t.user.username = :username", Trainer.class).setParameter("username", username).uniqueResultOptional();
     }
 
     @Override
     public List<Trainer> findAll() {
-        return storage.values().stream().toList();
+        Session session = sessionFactory.getCurrentSession();
+        return session.createQuery("from Trainer", Trainer.class).list();
+    }
+
+    @Override
+    public List<Trainer> findUnassignedTrainers(String traineeUsername) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createQuery(
+                "select t from Trainer t where t.id not in " +
+                        "(select tr.id from Trainee e join e.trainers tr where e.user.username = :username)",
+                Trainer.class).setParameter("username", traineeUsername).list();
     }
 }

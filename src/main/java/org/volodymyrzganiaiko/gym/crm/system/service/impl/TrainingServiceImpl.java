@@ -6,15 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainingDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Training;
+import org.volodymyrzganiaiko.gym.crm.system.service.AuthenticationService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainingService;
 
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class TrainingServiceImpl implements TrainingService {
     private TrainingDAO trainingDAO;
+    private AuthenticationService authenticationService;
 
     private static final Logger log = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
@@ -23,22 +27,64 @@ public class TrainingServiceImpl implements TrainingService {
         this.trainingDAO = trainingDAO;
     }
 
-    @Override
-    public Training create(Training training) {
-        training.setTrainingId(UUID.randomUUID());
-        log.info("Creating the training record with id {}", training.getTrainingId());
-        return trainingDAO.save(training);
+    @Autowired
+    public void setAuthenticationService(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
     @Override
-    public Optional<Training> findById(UUID trainingId) {
-        log.debug("Finding the training record with id {}", trainingId);
-        return trainingDAO.findById(trainingId);
+    @Transactional
+    public Training addTraining(String username, String password, Training training) {
+        authenticationService.check(username, password);
+        requireNotNull(training.getTrainee(), "trainee");
+        requireNotNull(training.getTrainee().getId(), "traineeId");
+        requireNotNull(training.getTrainer(), "trainer");
+        requireNotNull(training.getTrainer().getId(), "trainerId");
+        requireNotNull(training.getTrainingType(), "trainingType");
+        requireNotNull(training.getTrainingType().getId(), "trainingTypeId");
+        if (training.getTrainingName() == null || training.getTrainingName().isBlank()) {
+            throw new IllegalArgumentException("trainingName" + " must not be blank");
+        }
+        requireNotNull(training.getTrainingDate(), "trainingDate");
+        requireNotNull(training.getTrainingDurationInMinutes(), "trainingDurationInMinutes");
+        training = trainingDAO.save(training);
+        log.info("Creating the training record with id {}", training.getId());
+        return training;
+}
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Training> findById(Long id) {
+        log.debug("Finding the training record with id {}", id);
+        return trainingDAO.findById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Training> getTraineeTrainings(String traineeUsername, String password, LocalDate from, LocalDate to, String trainerUsername, String trainingTypeName) {
+        authenticationService.check(traineeUsername, password);
+        log.debug("Finding the training records for trainee with username {}", traineeUsername);
+        return trainingDAO.findTraineeTrainings(traineeUsername, from, to, trainerUsername, trainingTypeName);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Training> getTrainerTrainings(String trainerUsername, String password, LocalDate from, LocalDate to, String traineeUsername) {
+        authenticationService.check(trainerUsername, password);
+        log.debug("Finding the training records for trainer with username {}", trainerUsername);
+        return trainingDAO.findTrainerTrainings(trainerUsername, from, to, traineeUsername);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Training> findAll() {
         log.debug("Finding all training records");
         return trainingDAO.findAll();
+    }
+
+    private void requireNotNull(Object value, String fieldName) {
+        if (value == null) {
+            throw new IllegalArgumentException(fieldName + " must not be empty");
+        }
     }
 }

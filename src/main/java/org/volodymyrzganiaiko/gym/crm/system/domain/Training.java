@@ -1,88 +1,56 @@
 package org.volodymyrzganiaiko.gym.crm.system.domain;
 
-import java.time.LocalDate;
-import java.util.UUID;
+import lombok.*;
 
+import javax.persistence.*;
+import java.time.LocalDate;
+
+@Entity
+@Table(name="trainings")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Training {
-    private UUID trainingId;
-    private UUID traineeId;
-    private UUID trainerId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "training_id")
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trainee_id")
+    private Trainee trainee;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trainer_id")
+    private Trainer trainer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "training_type_id")
     private TrainingType trainingType;
+
+    @Column(name = "training_name", nullable = false)
     private String trainingName;
+
+    @Column(name = "training_date",  nullable = false)
     private LocalDate trainingDate;
+
+    @Column(name = "training_duration_in_minutes",  nullable = false)
     private Integer trainingDurationInMinutes;
 
-    public Training() {}
-
-    public Training(UUID trainingId, UUID traineeId, UUID trainerId, TrainingType trainingType, String trainingName, LocalDate trainingDate, Integer trainingDurationInMinutes) {
-        this.trainingId = trainingId;
-        this.traineeId = traineeId;
-        this.trainerId = trainerId;
+    public Training(Trainee trainee, Trainer trainer,  TrainingType trainingType, String trainingName, LocalDate trainingDate, Integer trainingDurationInMinutes) {
+        this.trainee = trainee;
+        this.trainer = trainer;
         this.trainingType = trainingType;
         this.trainingName = trainingName;
         this.trainingDate = trainingDate;
-        this.trainingDurationInMinutes = trainingDurationInMinutes;
-    }
-
-    public UUID getTrainingId() { return trainingId; }
-
-    public void setTrainingId(UUID trainingId) { this.trainingId = trainingId; }
-
-    public UUID getTraineeId() {
-        return traineeId;
-    }
-
-    public void setTraineeId(UUID traineeId) {
-        this.traineeId = traineeId;
-    }
-
-    public UUID getTrainerId() {
-        return trainerId;
-    }
-
-    public void setTrainerId(UUID trainerId) {
-        this.trainerId = trainerId;
-    }
-
-    public TrainingType getTrainingType() {
-        return trainingType;
-    }
-
-    public void setTrainingType(TrainingType trainingType) {
-        this.trainingType = trainingType;
-    }
-
-    public LocalDate getTrainingDate() {
-        return trainingDate;
-    }
-
-    public void setTrainingDate(LocalDate trainingDate) {
-        this.trainingDate = trainingDate;
-    }
-
-    public String getTrainingName() {
-        return trainingName;
-    }
-
-    public void setTrainingName(String trainingName) {
-        this.trainingName = trainingName;
-    }
-
-    public Integer getTrainingDurationInMinutes() {
-        return trainingDurationInMinutes;
-    }
-
-    public void setTrainingDurationInMinutes(Integer trainingDurationInMinutes) {
         this.trainingDurationInMinutes = trainingDurationInMinutes;
     }
 
     @Override
     public String toString() {
         return "Training{" +
-                "trainingId=" + trainingId +
-                ", traineeId=" + traineeId +
-                ", trainerId=" + trainerId +
-                ", trainingType=" + trainingType +
+                "id=" + id +
                 ", trainingName='" + trainingName + '\'' +
                 ", trainingDate=" + trainingDate +
                 ", trainingDurationInMinutes=" + trainingDurationInMinutes +

@@ -4,12 +4,12 @@ import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface TraineeDAO {
     Trainee save(Trainee trainee);
-    boolean update(Trainee trainee);
-    boolean delete(UUID traineeId);
-    Optional<Trainee> findById(UUID traineeId);
+    Trainee update(Trainee trainee);
+    boolean deleteByUsername(String username);
+    Optional<Trainee> findById(Long traineeId);
+    Optional<Trainee> findByUsername(String username);
     List<Trainee> findAll();
 }

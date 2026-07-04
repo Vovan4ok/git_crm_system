@@ -29,11 +29,6 @@ public class AuthenticationService {
     }
 
     @Transactional(readOnly = true)
-    public boolean authenticate(String username, String password) {
-        return matches(username, password);
-    }
-
-    @Transactional(readOnly = true)
     public void check(String username, String password) {
         if(!matches(username, password)) {
             throw new AuthenticationException("Wrong username or password");

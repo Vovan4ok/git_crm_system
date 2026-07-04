@@ -1,81 +1,39 @@
 package org.volodymyrzganiaiko.gym.crm.system.utils;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.volodymyrzganiaiko.gym.crm.system.domain.User;
 
-import java.util.*;
+import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CredentialsGeneratorTest {
-    CredentialsGenerator credentialsGenerator;
-
-    @BeforeEach
-    public void initCredentialsGenerator() {
-        credentialsGenerator = new CredentialsGenerator();
-    }
+    private final CredentialsGenerator generator = new CredentialsGenerator();
 
     @Test
-    public void testGenerateUsernameWithoutCollisions() {
-        User input = new User();
-        input.setFirstName("John");
-        input.setLastName("Doe");
-        String expected = "John.Doe";
-        Set<String> existingUsernames = new HashSet<>();
-
-        String result = credentialsGenerator.generateUsername(input, existingUsernames);
-
-        assertEquals(expected, result);
+    void noCollision_returnsFirstDotLast() {
+        assertEquals("John.Doe", generator.generateUsername(user("John","Doe"), Set.of()));
+    }
+    @Test
+    void collision_appendsSuffix() {
+        assertEquals("John.Doe.1", generator.generateUsername(user("John","Doe"), Set.of("John.Doe")));
+    }
+    @Test
+    void doubleCollision_incrementsSuffix() {
+        assertEquals("John.Doe.2", generator.generateUsername(user("John","Doe"), Set.of("John.Doe","John.Doe.1")));
+    }
+    @Test
+    void password_is10Chars_fromAlphabet() {
+        String p = generator.generatePassword();
+        assertNotNull(p);
+        assertEquals(10, p.length());
+        assertTrue(p.matches("[A-Za-z0-9]+"));
     }
 
-    @Test
-    public void testGenerateUsernameWithCollisions() {
-        User input = new User();
-        input.setFirstName("John");
-        input.setLastName("Doe");
-        String expected = "John.Doe.1";
-        Set<String> existingUsernames = Set.of("John.Doe");
-
-        String result = credentialsGenerator.generateUsername(input, existingUsernames);
-
-        assertEquals(expected, result);
-    }
-
-    @Test
-    public void testGenerateUsernameWithCrossCollisions() {
-        User input = new User();
-        input.setFirstName("John");
-        input.setLastName("Doe");
-        String expected = "John.Doe.2";
-        Set<String> existingUsernames = Set.of("John.Doe", "John.Doe.1");
-
-        String result = credentialsGenerator.generateUsername(input, existingUsernames);
-
-        assertEquals(expected, result);
-    }
-
-    @Test
-    public void testGeneratePasswordLengthEqualsTo10() {
+    private User user(String firstName, String lastName) {
         User user = new User();
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setPassword(credentialsGenerator.generatePassword());
-        assertEquals(10, user.getPassword().length());
-    }
-
-    @Test
-    public void testPasswordForSymbols() {
-        String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        User user = new User();
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setPassword(credentialsGenerator.generatePassword());
-        for  (int i = 0; i < user.getPassword().length(); i++) {
-            assertTrue(ALPHABET.contains(user.getPassword().substring(i, i + 1)));
-        }
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        return user;
     }
 }

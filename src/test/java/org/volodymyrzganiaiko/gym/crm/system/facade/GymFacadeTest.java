@@ -5,172 +5,276 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
-import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
-import org.volodymyrzganiaiko.gym.crm.system.domain.Training;
+import org.volodymyrzganiaiko.gym.crm.system.domain.*;
 import org.volodymyrzganiaiko.gym.crm.system.service.TraineeService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainerService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainingService;
+import org.volodymyrzganiaiko.gym.crm.system.service.TrainingTypeService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 @ExtendWith(MockitoExtension.class)
-public class GymFacadeTest {
+class GymFacadeTest {
     @Mock
-    TraineeService traineeService;
+    private TraineeService traineeService;
 
     @Mock
-    TrainerService trainerService;
+    private TrainerService trainerService;
 
     @Mock
-    TrainingService trainingService;
+    private TrainingService trainingService;
+
+    @Mock
+    private TrainingTypeService trainingTypeService;
 
     @InjectMocks
     GymFacade gymFacade;
 
     @Test
-    public void verifyTraineeCreate() {
+    void createTrainee() {
+        when(traineeService.create(any())).thenReturn(new Trainee(1L, null, null, new User(), null));
         Trainee input = new Trainee();
-        Trainee expected = new Trainee();
-        when(traineeService.create(input)).thenReturn(expected);
 
         Trainee result = gymFacade.createTrainee(input);
 
-        assertSame(expected, result);
+        assertEquals(1L, result.getId());
         verify(traineeService).create(input);
     }
 
     @Test
-    public void verifyUpdateTrainee() {
-        Trainee input = new Trainee();
-        when(traineeService.update(input)).thenReturn(true);
+    void findTraineeById() {
+        when(traineeService.findById(1L)).thenReturn(Optional.of(new Trainee()));
 
-        boolean result = gymFacade.updateTrainee(input);
+        Optional<Trainee> result = gymFacade.findTraineeById(1L);
+
+        assertTrue(result.isPresent());
+        verify(traineeService).findById(1L);
+    }
+
+    @Test
+    void findTraineeByUsername() {
+        when(traineeService.findByUsername("John.Doe", "pass")).thenReturn(Optional.of(new Trainee()));
+
+        Optional<Trainee> result = gymFacade.findTraineeByUsername("John.Doe", "pass");
+
+        assertTrue(result.isPresent());
+        verify(traineeService).findByUsername("John.Doe", "pass");
+    }
+
+    @Test
+    void changeTraineePassword() {
+        gymFacade.changeTraineePassword("John.Doe", "oldPass", "newPass");
+        verify(traineeService).changePassword("John.Doe", "oldPass", "newPass");
+    }
+
+    @Test
+    void updateTrainee() {
+        when(traineeService.update(eq("John.Doe"), eq("pass"), any())).thenReturn(new Trainee());
+
+        Trainee result = gymFacade.updateTrainee("John.Doe", "pass", new Trainee());
+
+        assertNotNull(result);
+        verify(traineeService).update(eq("John.Doe"), eq("pass"), any());
+    }
+
+    @Test
+    void activateTrainee() {
+        gymFacade.activateTrainee("John.Doe", "pass");
+        verify(traineeService).activate("John.Doe", "pass");
+    }
+
+    @Test
+    void deactivateTrainee() {
+        gymFacade.deactivateTrainee("John.Doe", "pass");
+        verify(traineeService).deactivate("John.Doe", "pass");
+    }
+
+    @Test
+    void deleteTraineeByUsername() {
+        when(traineeService.deleteByUsername("John.Doe", "pass")).thenReturn(true);
+
+        boolean result = gymFacade.deleteTraineeByUsername("John.Doe", "pass");
 
         assertTrue(result);
-        verify(traineeService).update(input);
+        verify(traineeService).deleteByUsername("John.Doe", "pass");
     }
 
     @Test
-    public void verifyDeleteTrainee() {
-        UUID input = UUID.randomUUID();
-        when(traineeService.delete(input)).thenReturn(true);
-
-        boolean result = gymFacade.deleteTrainee(input);
-
-        assertTrue(result);
-        verify(traineeService).delete(input);
-    }
-
-    @Test
-    public void verifyFindByIdTrainee() {
-        UUID input = UUID.randomUUID();
-        Optional<Trainee> expected = Optional.of(new Trainee());
-        when(traineeService.findById(input)).thenReturn(expected);
-
-        Optional<Trainee> result = gymFacade.findTraineeById(input);
-
-        assertSame(expected, result);
-        verify(traineeService).findById(input);
-    }
-
-    @Test
-    public void verifyFindAllTrainees() {
-        List<Trainee> expected = new ArrayList<>();
-        when(traineeService.findAll()).thenReturn(expected);
+    void findAllTrainees() {
+        when(traineeService.findAll()).thenReturn(List.of(new Trainee()));
 
         List<Trainee> result = gymFacade.findAllTrainees();
 
-        assertSame(expected, result);
+        assertNotNull(result);
         verify(traineeService).findAll();
     }
 
     @Test
-    public void verifyCreateTrainer() {
+    void updateTrainerListForTrainee() {
+        when(traineeService.updateTrainerList(eq("John.Doe"), eq("pass"), any())).thenReturn(new ArrayList<>());
+
+        List<Trainer> result = gymFacade.updateTrainerListForTrainee("John.Doe", "pass", new ArrayList<>());
+
+        assertNotNull(result);
+        verify(traineeService).updateTrainerList(eq("John.Doe"), eq("pass"), any());
+    }
+
+    @Test
+    void createTrainer() {
+        when(trainerService.create(any())).thenReturn(new Trainer());
         Trainer input = new Trainer();
-        Trainer expected = new Trainer();
-        when(trainerService.create(input)).thenReturn(expected);
 
         Trainer result = gymFacade.createTrainer(input);
 
-        assertSame(expected, result);
+        assertNotNull(result);
         verify(trainerService).create(input);
     }
 
     @Test
-    public void verifyUpdateTrainer() {
-        Trainer input = new Trainer();
-        when(trainerService.update(input)).thenReturn(true);
+    void findTrainerById() {
+        when(trainerService.findById(1L)).thenReturn(Optional.of(new Trainer()));
 
-        boolean result = gymFacade.updateTrainer(input);
+        Optional<Trainer> result = gymFacade.findTrainerById(1L);
 
-        assertTrue(result);
-        verify(trainerService).update(any());
+        assertTrue(result.isPresent());
+        verify(trainerService).findById(1L);
     }
 
     @Test
-    public void verifyFindByIdTrainer() {
-        UUID input = UUID.randomUUID();
-        Optional<Trainer> expected = Optional.of(new Trainer());
-        when(trainerService.findById(input)).thenReturn(expected);
+    void findTrainerByUsername() {
+        when(trainerService.findByUsername("John.Doe", "pass")).thenReturn(Optional.of(new Trainer()));
 
-        Optional<Trainer> result = gymFacade.findTrainerById(input);
+        Optional<Trainer> result = gymFacade.findTrainerByUsername("John.Doe", "pass");
 
-        assertSame(expected, result);
-        verify(trainerService).findById(any());
+        assertTrue(result.isPresent());
+        verify(trainerService).findByUsername("John.Doe", "pass");
     }
 
     @Test
-    public void verifyFindAllTrainers() {
-        List<Trainer> expected = new ArrayList<>();
-        when(trainerService.findAll()).thenReturn(expected);
+    void changeTrainerPassword() {
+        gymFacade.changeTrainerPassword("John.Doe", "oldPass", "newPass");
+        verify(trainerService).changePassword("John.Doe", "oldPass", "newPass");
+    }
+
+    @Test
+    void updateTrainer() {
+        when(trainerService.update(eq("John.Doe"), eq("pass"), any())).thenReturn(new Trainer());
+
+        Trainer result = gymFacade.updateTrainer("John.Doe", "pass", new Trainer());
+
+        assertNotNull(result);
+        verify(trainerService).update(eq("John.Doe"), eq("pass"), any());
+    }
+
+    @Test
+    void activateTrainer() {
+        gymFacade.activateTrainer("John.Doe", "pass");
+        verify(trainerService).activate("John.Doe", "pass");
+    }
+
+    @Test
+    void deactivateTrainer() {
+        gymFacade.deactivateTrainer("John.Doe", "pass");
+        verify(trainerService).deactivate("John.Doe", "pass");
+    }
+
+    @Test
+    void getUnassignedTrainers() {
+        when(trainerService.getUnassignedTrainers("John.Doe", "pass")).thenReturn(new ArrayList<>());
+
+        List<Trainer> result = gymFacade.getUnassignedTrainers("John.Doe", "pass");
+
+        assertNotNull(result);
+        verify(trainerService).getUnassignedTrainers("John.Doe", "pass");
+    }
+
+    @Test
+    void findAllTrainers() {
+        when(trainerService.findAll()).thenReturn(List.of(new Trainer()));
 
         List<Trainer> result = gymFacade.findAllTrainers();
 
-        assertSame(expected, result);
+        assertNotNull(result);
         verify(trainerService).findAll();
     }
 
     @Test
-    public void verifyCreateTraining() {
+    void createTraining() {
+        when(trainingService.addTraining(eq("John.Doe"), eq("pass"), any())).thenReturn(new Training());
         Training input = new Training();
-        Training expected = new Training();
-        when(trainingService.create(input)).thenReturn(expected);
 
-        Training result = gymFacade.createTraining(input);
+        Training result = gymFacade.createTraining("John.Doe", "pass", input);
 
-        assertSame(expected, result);
-        verify(trainingService).create(input);
+        assertNotNull(result);
+        verify(trainingService).addTraining(eq("John.Doe"), eq("pass"), eq(input));
     }
 
     @Test
-    public void findTrainingById() {
-        UUID input = UUID.randomUUID();
-        Optional<Training> expected = Optional.of(new Training());
-        when(trainingService.findById(input)).thenReturn(expected);
+    void findTrainingById() {
+        when(trainingService.findById(1L)).thenReturn(Optional.of(new Training()));
 
-        Optional<Training> result = gymFacade.findTrainingById(input);
+        Optional<Training> result = gymFacade.findTrainingById(1L);
 
-        assertSame(expected, result);
-        verify(trainingService).findById(input);
+        assertTrue(result.isPresent());
+        verify(trainingService).findById(1L);
     }
 
     @Test
-    public void findAllTrainings() {
-        List<Training> expected = new ArrayList<>();
-        when(trainingService.findAll()).thenReturn(expected);
+    void getTraineeTrainings() {
+        when(trainingService.getTraineeTrainings("John.Doe", "pass", null, null, null, null)).thenReturn(new ArrayList<>());
+
+        List<Training> result = gymFacade.getTraineeTrainings("John.Doe", "pass", null, null, null, null);
+
+        assertNotNull(result);
+        verify(trainingService).getTraineeTrainings("John.Doe", "pass", null, null, null, null);
+    }
+
+    @Test
+    void getTrainerTrainings() {
+        when(trainingService.getTrainerTrainings("John.Doe", "pass", null, null, null)).thenReturn(new ArrayList<>());
+
+        List<Training> result = gymFacade.getTrainerTrainings("John.Doe", "pass", null, null, null);
+
+        assertNotNull(result);
+        verify(trainingService).getTrainerTrainings("John.Doe", "pass", null, null, null);
+    }
+
+    @Test
+    void findAllTrainings() {
+        when(trainingService.findAll()).thenReturn(new ArrayList<>());
 
         List<Training> result = gymFacade.findAllTrainings();
 
-        assertSame(expected, result);
+        assertNotNull(result);
         verify(trainingService).findAll();
+    }
+
+    @Test
+    void findTrainingTypeById() {
+        when(trainingTypeService.findById(1L)).thenReturn(Optional.of(new TrainingType()));
+
+        Optional<TrainingType> result = gymFacade.findTrainingTypeById(1L);
+
+        assertTrue(result.isPresent());
+        verify(trainingTypeService).findById(1L);
+    }
+
+    @Test
+    void findAllTrainingTypes() {
+        when(trainingTypeService.findAll()).thenReturn(new ArrayList<>());
+
+        List<TrainingType> result = gymFacade.findAllTrainingTypes();
+
+        assertNotNull(result);
+        verify(trainingTypeService).findAll();
     }
 }

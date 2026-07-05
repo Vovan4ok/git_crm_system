@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.volodymyrzganiaiko.gym.crm.system.utils.ValueValidator.requireNotNull;
+
 @Service
 public class TrainingServiceImpl implements TrainingService {
     private TrainingDAO trainingDAO;
@@ -80,11 +82,5 @@ public class TrainingServiceImpl implements TrainingService {
     public List<Training> findAll() {
         log.debug("Finding all training records");
         return trainingDAO.findAll();
-    }
-
-    private void requireNotNull(Object value, String fieldName) {
-        if (value == null) {
-            throw new IllegalArgumentException(fieldName + " must not be empty");
-        }
     }
 }

@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static org.volodymyrzganiaiko.gym.crm.system.utils.ValueValidator.requireNotBlank;
+
 @Service
 public class TrainerServiceImpl implements TrainerService {
     private TrainerDAO trainerDAO;
@@ -71,6 +73,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional(readOnly = true)
     public Optional<Trainer> findByUsername(String username, String password) {
         authenticationService.check(username, password);
+        log.debug("Finding the trainer with username {}", username);
         return trainerDAO.findByUsername(username);
     }
 
@@ -80,11 +83,13 @@ public class TrainerServiceImpl implements TrainerService {
         authenticationService.check(username, oldPassword);
         Optional<Trainer> foundTraineeOpt = trainerDAO.findByUsername(username);
         if (foundTraineeOpt.isEmpty()) {
+            log.warn("Trainer with username {} wasn't found", username);
             throw new IllegalArgumentException("Trainer with username " + username + " was not found");
         }
         Trainer trainer = foundTraineeOpt.get();
         requireNotBlank(newPassword, "password");
         trainer.getUser().setPassword(newPassword);
+        log.info("Changing the password for the trainer with username {}", username);
         trainerDAO.update(trainer);
     }
 
@@ -94,6 +99,7 @@ public class TrainerServiceImpl implements TrainerService {
         authenticationService.check(username, password);
         Optional<Trainer> foundTrainerOpt = trainerDAO.findByUsername(username);
         if (foundTrainerOpt.isEmpty()) {
+            log.warn("Trainer with username {} wasn't found", username);
             throw new IllegalArgumentException("Trainer with username " + username + " was not found");
         }
         Trainer foundTrainer = foundTrainerOpt.get();
@@ -102,6 +108,7 @@ public class TrainerServiceImpl implements TrainerService {
         foundTrainer.getUser().setFirstName(trainer.getUser().getFirstName());
         requireNotBlank(trainer.getUser().getLastName(), "lastName");
         foundTrainer.getUser().setLastName(trainer.getUser().getLastName());
+        log.info("Updating the trainer with username {}", username);
         return trainerDAO.update(foundTrainer);
     }
 
@@ -111,13 +118,16 @@ public class TrainerServiceImpl implements TrainerService {
         authenticationService.check(username, password);
         Optional<Trainer> foundTrainerOpt = trainerDAO.findByUsername(username);
         if (foundTrainerOpt.isEmpty()) {
+            log.warn("Trainer with username {} wasn't found", username);
             throw new IllegalArgumentException("Trainer with the username " + username + " was not found");
         }
         Trainer foundTrainer = foundTrainerOpt.get();
         if (foundTrainer.getUser().getIsActive()) {
+            log.warn("Trainer with the username {} is already active", username);
             throw new IllegalStateException("Trainer with the username " + username + " is already active");
         }
         foundTrainer.getUser().setIsActive(true);
+        log.info("Activating the trainer with username {}", username);
         trainerDAO.update(foundTrainer);
     }
 
@@ -127,13 +137,16 @@ public class TrainerServiceImpl implements TrainerService {
         authenticationService.check(username, password);
         Optional<Trainer> foundTrainerOpt = trainerDAO.findByUsername(username);
         if (foundTrainerOpt.isEmpty()) {
+            log.warn("Trainer with username {} wasn't found", username);
             throw new IllegalArgumentException("Trainer with the username " + username + " was not found");
         }
         Trainer foundTrainer = foundTrainerOpt.get();
         if (!foundTrainer.getUser().getIsActive()) {
+            log.warn("Trainer with the username {} is already deactivated", username);
             throw new IllegalStateException("Trainer with the username " + username + " is already inactive");
         }
         foundTrainer.getUser().setIsActive(false);
+        log.info("Deactivating the trainer with username {}", username);
         trainerDAO.update(foundTrainer);
     }
 
@@ -141,6 +154,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional(readOnly = true)
     public List<Trainer> getUnassignedTrainers(String traineeUsername, String password) {
         authenticationService.check(traineeUsername, password);
+        log.debug("Finding unassigned trainers for the trainee with username {}", traineeUsername);
         return trainerDAO.findUnassignedTrainers(traineeUsername);
     }
 
@@ -156,11 +170,5 @@ public class TrainerServiceImpl implements TrainerService {
             throw new IllegalArgumentException("Specialization (training type) id is required");
         }
         return trainingTypeDAO.findById(specialization.getId()).orElseThrow(() -> new IllegalArgumentException("Training type with id " + specialization.getId() + " not found"));
-    }
-
-    private void requireNotBlank(String value, String fieldName) {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(fieldName + " must not be blank");
-        }
     }
 }

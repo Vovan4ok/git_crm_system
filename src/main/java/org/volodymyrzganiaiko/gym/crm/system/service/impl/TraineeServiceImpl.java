@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.volodymyrzganiaiko.gym.crm.system.utils.ValueValidator.requireNotBlank;
+
 @Service
 public class TraineeServiceImpl implements TraineeService {
     private TraineeDAO traineeDAO;
@@ -73,6 +75,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional(readOnly = true)
     public Optional<Trainee> findByUsername(String username, String password) {
         authenticationService.check(username, password);
+        log.debug("Finding the trainee with username {}", username);
         return traineeDAO.findByUsername(username);
     }
 
@@ -89,11 +92,13 @@ public class TraineeServiceImpl implements TraineeService {
         authenticationService.check(username, oldPassword);
         Optional<Trainee> foundTraineeOpt = traineeDAO.findByUsername(username);
         if (foundTraineeOpt.isEmpty()) {
+            log.warn("Trainee with username {} wasn't found", username);
             throw new IllegalArgumentException("Trainee with username " + username + " was not found");
         }
         Trainee trainee = foundTraineeOpt.get();
         requireNotBlank(newPassword, "password");
         trainee.getUser().setPassword(newPassword);
+        log.info("Trainee with username {} is changing the password", username);
         traineeDAO.update(trainee);
     }
 
@@ -103,6 +108,7 @@ public class TraineeServiceImpl implements TraineeService {
         authenticationService.check(username, password);
         Optional<Trainee> foundTraineeOpt = traineeDAO.findByUsername(username);
         if (foundTraineeOpt.isEmpty()) {
+            log.warn("Trainee with username {} was not found", username);
             throw new IllegalArgumentException("Trainee with usernames " + username + " and " + trainee.getUser().getUsername() + " was not found");
         }
         Trainee foundTrainee = foundTraineeOpt.get();
@@ -112,6 +118,7 @@ public class TraineeServiceImpl implements TraineeService {
         foundTrainee.getUser().setFirstName(trainee.getUser().getFirstName());
         requireNotBlank(trainee.getUser().getLastName(), "lastName");
         foundTrainee.getUser().setLastName(trainee.getUser().getLastName());
+        log.info("Updating the trainee with username {}", username);
         return traineeDAO.update(foundTrainee);
     }
 
@@ -121,13 +128,17 @@ public class TraineeServiceImpl implements TraineeService {
         authenticationService.check(username, password);
         Optional<Trainee> foundTraineeOpt = traineeDAO.findByUsername(username);
         if (foundTraineeOpt.isEmpty()) {
+            log.warn("Trainee with username {} was not found", username);
             throw new IllegalArgumentException("Trainee with the username " + username + " was not found");
         }
         Trainee foundTrainee = foundTraineeOpt.get();
         if (foundTrainee.getUser().getIsActive()) {
+            log.warn("Trainee with username {} is already active", username);
             throw new IllegalStateException("Trainee with the username " + username + " is already active");
         }
         foundTrainee.getUser().setIsActive(true);
+        log.info("Activating the trainee with username {}", username);
+
         traineeDAO.update(foundTrainee);
     }
 
@@ -137,13 +148,16 @@ public class TraineeServiceImpl implements TraineeService {
         authenticationService.check(username, password);
         Optional<Trainee> foundTraineeOpt = traineeDAO.findByUsername(username);
         if (foundTraineeOpt.isEmpty()) {
+            log.warn("Trainee with username {} was not found", username);
             throw new IllegalArgumentException("Trainee with the username" + username + " was not found");
         }
         Trainee foundTrainee = foundTraineeOpt.get();
         if (!foundTrainee.getUser().getIsActive()) {
+            log.warn("Trainee with username {} is already deactivated", username);
             throw new IllegalStateException("Trainee with the username " + username + " is already inactive");
         }
         foundTrainee.getUser().setIsActive(false);
+        log.info("Deactivating the trainee with username {}", username);
         traineeDAO.update(foundTrainee);
     }
 
@@ -151,6 +165,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public boolean deleteByUsername(String username, String password) {
         authenticationService.check(username, password);
+        log.info("Deleting the trainee with username {}", username);
         return traineeDAO.deleteByUsername(username);
     }
 
@@ -160,6 +175,7 @@ public class TraineeServiceImpl implements TraineeService {
         authenticationService.check(username, password);
         Optional<Trainee> foundTraineeOpt = traineeDAO.findByUsername(username);
         if (foundTraineeOpt.isEmpty()) {
+            log.warn("Trainee with username {} was not found", username);
             throw new IllegalArgumentException("Trainee with the username " + username + " was not found");
         }
         Trainee trainee = foundTraineeOpt.get();
@@ -167,18 +183,14 @@ public class TraineeServiceImpl implements TraineeService {
         for (String trainerUsername : trainerUsernames) {
             Optional<Trainer> trainer = trainerDAO.findByUsername(trainerUsername);
             if (trainer.isEmpty()) {
+                log.warn("Trainer with username {} was not found", trainerUsername);
                 throw new IllegalArgumentException("Trainer with username " + trainerUsername + " was not found");
             }
             updatedTrainers.add(trainer.get());
         }
         trainee.setTrainers(updatedTrainers);
+        log.info("Updating trainerList for the trainee with username {}", username);
         traineeDAO.update(trainee);
         return updatedTrainers.stream().toList();
-    }
-
-    private void requireNotBlank(String value, String fieldName) {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(fieldName + " must not be blank");
-        }
     }
 }

@@ -52,9 +52,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     public Trainer create(Trainer trainer) {
         User user = trainer.getUser();
-        user.setIsActive(true);
-        user.setUsername(credentialsService.generateUsername(user));
-        user.setPassword(credentialsService.generatePassword());
+        credentialsService.assignCredentials(user);
         trainer.setUser(user);
         trainer.setSpecialization(resolveSpecialization(trainer.getSpecialization()));
         trainer = trainerDAO.save(trainer);
@@ -81,12 +79,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     public void changePassword(String username, String oldPassword, String newPassword) {
         authenticationService.check(username, oldPassword);
-        Optional<Trainer> foundTraineeOpt = trainerDAO.findByUsername(username);
-        if (foundTraineeOpt.isEmpty()) {
-            log.warn("Trainer with username {} wasn't found", username);
-            throw new IllegalArgumentException("Trainer with username " + username + " was not found");
-        }
-        Trainer trainer = foundTraineeOpt.get();
+        Trainer trainer = getByUsernameOrThrow(username);
         requireNotBlank(newPassword, "password");
         trainer.getUser().setPassword(newPassword);
         log.info("Changing the password for the trainer with username {}", username);
@@ -97,17 +90,12 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     public Trainer update(String username, String password, Trainer trainer) {
         authenticationService.check(username, password);
-        Optional<Trainer> foundTrainerOpt = trainerDAO.findByUsername(username);
-        if (foundTrainerOpt.isEmpty()) {
-            log.warn("Trainer with username {} wasn't found", username);
-            throw new IllegalArgumentException("Trainer with username " + username + " was not found");
-        }
-        Trainer foundTrainer = foundTrainerOpt.get();
-        foundTrainer.setSpecialization(resolveSpecialization(trainer.getSpecialization()));
+        Trainer foundTrainer = getByUsernameOrThrow(username);
         requireNotBlank(trainer.getUser().getFirstName(), "firstName");
         foundTrainer.getUser().setFirstName(trainer.getUser().getFirstName());
         requireNotBlank(trainer.getUser().getLastName(), "lastName");
         foundTrainer.getUser().setLastName(trainer.getUser().getLastName());
+        foundTrainer.setSpecialization(resolveSpecialization(trainer.getSpecialization()));
         log.info("Updating the trainer with username {}", username);
         return trainerDAO.update(foundTrainer);
     }
@@ -116,12 +104,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     public void activate(String username, String password) {
         authenticationService.check(username, password);
-        Optional<Trainer> foundTrainerOpt = trainerDAO.findByUsername(username);
-        if (foundTrainerOpt.isEmpty()) {
-            log.warn("Trainer with username {} wasn't found", username);
-            throw new IllegalArgumentException("Trainer with the username " + username + " was not found");
-        }
-        Trainer foundTrainer = foundTrainerOpt.get();
+        Trainer foundTrainer = getByUsernameOrThrow(username);
         if (foundTrainer.getUser().getIsActive()) {
             log.warn("Trainer with the username {} is already active", username);
             throw new IllegalStateException("Trainer with the username " + username + " is already active");
@@ -135,12 +118,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     public void deactivate(String username, String password) {
         authenticationService.check(username, password);
-        Optional<Trainer> foundTrainerOpt = trainerDAO.findByUsername(username);
-        if (foundTrainerOpt.isEmpty()) {
-            log.warn("Trainer with username {} wasn't found", username);
-            throw new IllegalArgumentException("Trainer with the username " + username + " was not found");
-        }
-        Trainer foundTrainer = foundTrainerOpt.get();
+        Trainer foundTrainer = getByUsernameOrThrow(username);
         if (!foundTrainer.getUser().getIsActive()) {
             log.warn("Trainer with the username {} is already deactivated", username);
             throw new IllegalStateException("Trainer with the username " + username + " is already inactive");
@@ -170,5 +148,14 @@ public class TrainerServiceImpl implements TrainerService {
             throw new IllegalArgumentException("Specialization (training type) id is required");
         }
         return trainingTypeDAO.findById(specialization.getId()).orElseThrow(() -> new IllegalArgumentException("Training type with id " + specialization.getId() + " not found"));
+    }
+
+    private Trainer getByUsernameOrThrow(String username) {
+        Optional<Trainer> foundTrainerOpt = trainerDAO.findByUsername(username);
+        if (foundTrainerOpt.isEmpty()) {
+            log.warn("Trainer with username {} wasn't found", username);
+            throw new IllegalArgumentException("Trainer with the username " + username + " was not found");
+        }
+        return foundTrainerOpt.get();
     }
 }

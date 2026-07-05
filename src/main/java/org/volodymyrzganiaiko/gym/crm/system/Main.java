@@ -17,8 +17,8 @@ public class Main {
             /////Trainees
             Trainee trainee = new Trainee();
             User user =  new User();
-            user.setLastName("John");
-            user.setFirstName("Doe");
+            user.setFirstName("John");
+            user.setLastName("Doe");
             trainee.setUser(user);
             trainee.setDateOfBirth(LocalDate.parse("2003-11-08"));
             trainee.setAddress("Test address");

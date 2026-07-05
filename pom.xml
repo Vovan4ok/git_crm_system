@@ -39,6 +39,11 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**/Main.class</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

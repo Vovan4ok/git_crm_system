@@ -5,7 +5,7 @@ public class ValueValidator {
 
     public static void requireNotNull(Object value, String fieldName) {
         if (value == null) {
-            throw new IllegalArgumentException(fieldName + " must not be empty");
+            throw new IllegalArgumentException(fieldName + " must not be null");
         }
     }
 

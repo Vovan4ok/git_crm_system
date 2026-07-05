@@ -55,9 +55,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public Trainee create(Trainee trainee) {
         User user = trainee.getUser();
-        user.setIsActive(true);
-        user.setUsername(credentialsService.generateUsername(user));
-        user.setPassword(credentialsService.generatePassword());
+        credentialsService.assignCredentials(user);
         trainee.setUser(user);
         trainee = traineeDAO.save(trainee);
         log.info("Creating a trainee record with id {}", trainee.getId());
@@ -90,12 +88,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public void changePassword(String username, String oldPassword, String newPassword) {
         authenticationService.check(username, oldPassword);
-        Optional<Trainee> foundTraineeOpt = traineeDAO.findByUsername(username);
-        if (foundTraineeOpt.isEmpty()) {
-            log.warn("Trainee with username {} wasn't found", username);
-            throw new IllegalArgumentException("Trainee with username " + username + " was not found");
-        }
-        Trainee trainee = foundTraineeOpt.get();
+        Trainee trainee = getByUsernameOrThrow(username);
         requireNotBlank(newPassword, "password");
         trainee.getUser().setPassword(newPassword);
         log.info("Trainee with username {} is changing the password", username);
@@ -106,18 +99,13 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public Trainee update(String username, String password, Trainee trainee) {
         authenticationService.check(username, password);
-        Optional<Trainee> foundTraineeOpt = traineeDAO.findByUsername(username);
-        if (foundTraineeOpt.isEmpty()) {
-            log.warn("Trainee with username {} was not found", username);
-            throw new IllegalArgumentException("Trainee with usernames " + username + " and " + trainee.getUser().getUsername() + " was not found");
-        }
-        Trainee foundTrainee = foundTraineeOpt.get();
-        foundTrainee.setDateOfBirth(trainee.getDateOfBirth());
-        foundTrainee.setAddress(trainee.getAddress());
+        Trainee foundTrainee = getByUsernameOrThrow(username);
         requireNotBlank(trainee.getUser().getFirstName(), "firstName");
         foundTrainee.getUser().setFirstName(trainee.getUser().getFirstName());
         requireNotBlank(trainee.getUser().getLastName(), "lastName");
         foundTrainee.getUser().setLastName(trainee.getUser().getLastName());
+        foundTrainee.setDateOfBirth(trainee.getDateOfBirth());
+        foundTrainee.setAddress(trainee.getAddress());
         log.info("Updating the trainee with username {}", username);
         return traineeDAO.update(foundTrainee);
     }
@@ -126,12 +114,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public void activate(String username, String password) {
         authenticationService.check(username, password);
-        Optional<Trainee> foundTraineeOpt = traineeDAO.findByUsername(username);
-        if (foundTraineeOpt.isEmpty()) {
-            log.warn("Trainee with username {} was not found", username);
-            throw new IllegalArgumentException("Trainee with the username " + username + " was not found");
-        }
-        Trainee foundTrainee = foundTraineeOpt.get();
+        Trainee foundTrainee = getByUsernameOrThrow(username);
         if (foundTrainee.getUser().getIsActive()) {
             log.warn("Trainee with username {} is already active", username);
             throw new IllegalStateException("Trainee with the username " + username + " is already active");
@@ -146,12 +129,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public void deactivate(String username, String password) {
         authenticationService.check(username, password);
-        Optional<Trainee> foundTraineeOpt = traineeDAO.findByUsername(username);
-        if (foundTraineeOpt.isEmpty()) {
-            log.warn("Trainee with username {} was not found", username);
-            throw new IllegalArgumentException("Trainee with the username" + username + " was not found");
-        }
-        Trainee foundTrainee = foundTraineeOpt.get();
+        Trainee foundTrainee = getByUsernameOrThrow(username);
         if (!foundTrainee.getUser().getIsActive()) {
             log.warn("Trainee with username {} is already deactivated", username);
             throw new IllegalStateException("Trainee with the username " + username + " is already inactive");
@@ -173,12 +151,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public List<Trainer> updateTrainerList(String username, String password, List<String> trainerUsernames) {
         authenticationService.check(username, password);
-        Optional<Trainee> foundTraineeOpt = traineeDAO.findByUsername(username);
-        if (foundTraineeOpt.isEmpty()) {
-            log.warn("Trainee with username {} was not found", username);
-            throw new IllegalArgumentException("Trainee with the username " + username + " was not found");
-        }
-        Trainee trainee = foundTraineeOpt.get();
+        Trainee trainee = getByUsernameOrThrow(username);
         Set<Trainer> updatedTrainers = new HashSet<>();
         for (String trainerUsername : trainerUsernames) {
             Optional<Trainer> trainer = trainerDAO.findByUsername(trainerUsername);
@@ -192,5 +165,14 @@ public class TraineeServiceImpl implements TraineeService {
         log.info("Updating trainerList for the trainee with username {}", username);
         traineeDAO.update(trainee);
         return updatedTrainers.stream().toList();
+    }
+
+    private Trainee getByUsernameOrThrow(String username) {
+        Optional<Trainee> foundTraineeOpt = traineeDAO.findByUsername(username);
+        if (foundTraineeOpt.isEmpty()) {
+            log.warn("Trainee with username {} was not found", username);
+            throw new IllegalArgumentException("Trainee with the username " + username + " was not found");
+        }
+        return foundTraineeOpt.get();
     }
 }

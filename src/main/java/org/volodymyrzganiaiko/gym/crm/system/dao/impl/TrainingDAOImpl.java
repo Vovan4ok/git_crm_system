@@ -50,22 +50,7 @@ public class TrainingDAOImpl implements TrainingDAO {
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<Training> cr =  cb.createQuery(Training.class);
         Root<Training> root = cr.from(Training.class);
-        List<Predicate> predicates = new ArrayList<>();
-        if (traineeUsername != null) {
-            predicates.add(cb.equal(root.get("trainee").get("user").get("username"), traineeUsername));
-        }
-        if (fromDate != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("trainingDate"), fromDate));
-        }
-        if (toDate != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("trainingDate"), toDate));
-        }
-        if (trainerUsername != null) {
-            predicates.add(cb.equal(root.get("trainer").get("user").get("username"), trainerUsername));
-        }
-        if (trainingTypeName != null) {
-            predicates.add(cb.equal(root.get("trainingType").get("trainingTypeName"), trainingTypeName));
-        }
+        List<Predicate> predicates = buildPredicates(cb, root, traineeUsername, trainerUsername, fromDate, toDate, trainingTypeName);
         cr.select(root).where(predicates.toArray(new Predicate[0]));
         return session.createQuery(cr).getResultList();
     }
@@ -76,20 +61,29 @@ public class TrainingDAOImpl implements TrainingDAO {
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<Training> cr =  cb.createQuery(Training.class);
         Root<Training> root = cr.from(Training.class);
+        List<Predicate> predicates = buildPredicates(cb, root, traineeUsername, trainerUsername, fromDate, toDate, null);
+        cr.select(root).where(predicates.toArray(new Predicate[0]));
+        return session.createQuery(cr).getResultList();
+    }
+
+    private List<Predicate> buildPredicates(CriteriaBuilder cb, Root<Training> root,
+                                            String traineeUsername, String trainerUsername, LocalDate from, LocalDate to, String trainingTypeName) {
         List<Predicate> predicates = new ArrayList<>();
         if (traineeUsername != null) {
             predicates.add(cb.equal(root.get("trainee").get("user").get("username"), traineeUsername));
         }
-        if (fromDate != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("trainingDate"), fromDate));
+        if (from != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("trainingDate"), from));
         }
-        if (toDate != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("trainingDate"), toDate));
+        if (to != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("trainingDate"), to));
         }
         if (trainerUsername != null) {
             predicates.add(cb.equal(root.get("trainer").get("user").get("username"), trainerUsername));
         }
-        cr.select(root).where(predicates.toArray(new Predicate[0]));
-        return session.createQuery(cr).getResultList();
+        if (trainingTypeName != null) {
+            predicates.add(cb.equal(root.get("trainingType").get("trainingTypeName"), trainingTypeName));
+        }
+        return predicates;
     }
 }

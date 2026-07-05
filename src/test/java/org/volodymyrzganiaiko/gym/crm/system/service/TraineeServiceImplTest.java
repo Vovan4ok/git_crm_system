@@ -52,8 +52,13 @@ public class TraineeServiceImplTest {
 
     @Test
     public void create_generatesCredentials_andSaves() {
-        when(credentialsService.generateUsername(any(User.class))).thenReturn("John.Doe");
-        when(credentialsService.generatePassword()).thenReturn("random");
+        doAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setUsername("John.Doe");
+            u.setPassword("random");
+            u.setIsActive(true);
+            return null;
+        }).when(credentialsService).assignCredentials(any(User.class));
         when(traineeDAO.save(any(Trainee.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Trainee result = traineeService.create(trainee);
@@ -63,6 +68,7 @@ public class TraineeServiceImplTest {
         assertEquals("random", result.getUser().getPassword());
         verify(traineeDAO).save(trainee);
         verifyNoInteractions(authenticationService);
+        verify(credentialsService).assignCredentials(trainee.getUser());
     }
 
     @Test

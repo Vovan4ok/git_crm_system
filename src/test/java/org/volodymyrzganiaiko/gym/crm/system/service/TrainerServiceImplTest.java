@@ -56,8 +56,13 @@ public class TrainerServiceImplTest {
 
     @Test
     public void create_generatesCredentials_andSaves() {
-        when(credentialsService.generateUsername(any(User.class))).thenReturn("John.Doe");
-        when(credentialsService.generatePassword()).thenReturn("random");
+        doAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setUsername("John.Doe");
+            u.setPassword("random");
+            u.setIsActive(true);
+            return null;
+        }).when(credentialsService).assignCredentials(any(User.class));
         when(trainerDAO.save(any(Trainer.class))).thenAnswer(inv -> inv.getArgument(0));
         when(trainingTypeDAO.findById(1L)).thenReturn(Optional.of(new TrainingType(1L, "Yoga")));
 
@@ -68,12 +73,11 @@ public class TrainerServiceImplTest {
         assertEquals("random", result.getUser().getPassword());
         verify(trainerDAO).save(trainer);
         verifyNoInteractions(authenticationService);
+        verify(credentialsService).assignCredentials(trainer.getUser());
     }
 
     @Test
     public void create_throwsException() {
-        when(credentialsService.generateUsername(any(User.class))).thenReturn("John.Doe");
-        when(credentialsService.generatePassword()).thenReturn("random");
         trainer.setSpecialization(null);
 
         assertThrows(IllegalArgumentException.class, () -> trainerService.create(trainer));
@@ -156,7 +160,6 @@ public class TrainerServiceImplTest {
     @Test
     public void update_blankFirstName_throwsException() {
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
-        when(trainingTypeDAO.findById(1L)).thenReturn(Optional.of(new TrainingType(1L, "Yoga")));
 
         trainer.getUser().setFirstName("");
 

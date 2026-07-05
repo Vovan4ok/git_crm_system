@@ -50,7 +50,7 @@ public class Trainee {
     @Override
     public String toString() {
         return "Trainee{" +
-                "id =" + id +
+                "id=" + id +
                 ", dateOfBirth=" + dateOfBirth +
                 ", address='" + address + '\'' +
                 '}';

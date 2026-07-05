@@ -41,4 +41,10 @@ public class CredentialsService {
         return credentialsGenerator.generatePassword();
     }
 
+    public void assignCredentials(User user) {
+        user.setIsActive(true);
+        user.setUsername(generateUsername(user));
+        user.setPassword(generatePassword());
+    }
+
 }

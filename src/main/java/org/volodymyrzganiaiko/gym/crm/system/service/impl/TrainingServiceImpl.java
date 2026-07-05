@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.volodymyrzganiaiko.gym.crm.system.utils.ValueValidator.requireNotBlank;
 import static org.volodymyrzganiaiko.gym.crm.system.utils.ValueValidator.requireNotNull;
 
 @Service
@@ -44,9 +45,7 @@ public class TrainingServiceImpl implements TrainingService {
         requireNotNull(training.getTrainer().getId(), "trainerId");
         requireNotNull(training.getTrainingType(), "trainingType");
         requireNotNull(training.getTrainingType().getId(), "trainingTypeId");
-        if (training.getTrainingName() == null || training.getTrainingName().isBlank()) {
-            throw new IllegalArgumentException("trainingName" + " must not be blank");
-        }
+        requireNotBlank(training.getTrainingName(), "trainingName");
         requireNotNull(training.getTrainingDate(), "trainingDate");
         requireNotNull(training.getTrainingDurationInMinutes(), "trainingDurationInMinutes");
         training = trainingDAO.save(training);

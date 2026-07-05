@@ -65,6 +65,38 @@ public class TrainerDAOImplTest {
     }
 
     @Test
+    public void findById_found() {
+        trainer = trainerDAO.save(trainer);
+        flushAndClear();
+
+        Optional<Trainer> reloaded =  trainerDAO.findById(trainer.getId());
+        assertTrue(reloaded.isPresent());
+        assertEquals(trainer.getUser().getUsername(), reloaded.get().getUser().getUsername());
+    }
+
+    @Test
+    public void findById_not_found() {
+        trainer = trainerDAO.save(trainer);
+        flushAndClear();
+
+        Optional<Trainer> reloaded =  trainerDAO.findById(99L);
+        assertTrue(reloaded.isEmpty());
+    }
+
+    @Test
+    public void update_success() {
+        trainer = trainerDAO.save(trainer);
+        flushAndClear();
+
+        trainer.getUser().setFirstName("Test");
+        trainer = trainerDAO.update(trainer);
+        flushAndClear();
+
+        Trainer reloaded = trainerDAO.findById(trainer.getId()).orElseThrow();
+        assertEquals("Test", reloaded.getUser().getFirstName());
+    }
+
+    @Test
     public void findByUsername_found() {
         Trainer savedTrainer = trainerDAO.save(trainer);
         flushAndClear();
@@ -115,5 +147,15 @@ public class TrainerDAOImplTest {
         List<Trainer> result = trainerDAO.findUnassignedTrainers("Ann.Free");
         List<String> resultUsernames = result.stream().map(t -> t.getUser().getUsername()).toList();
         assertTrue(resultUsernames.isEmpty());
+    }
+
+    @Test
+    public void findAll() {
+        trainer = trainerDAO.save(trainer);
+        flushAndClear();
+
+        List<Trainer> result = trainerDAO.findAll();
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
     }
 }

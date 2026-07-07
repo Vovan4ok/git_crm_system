@@ -41,7 +41,9 @@ class GymFacadeTest {
 
     @Test
     void createTrainee() {
-        when(traineeService.create(any())).thenReturn(new Trainee(1L, null, null, new User(), null));
+        Trainee returnTrainee = new Trainee(null, null, null, null, null, null, null, null);
+        returnTrainee.setId(1L);
+        when(traineeService.create(any())).thenReturn(returnTrainee);
         Trainee input = new Trainee();
 
         Trainee result = gymFacade.createTrainee(input);

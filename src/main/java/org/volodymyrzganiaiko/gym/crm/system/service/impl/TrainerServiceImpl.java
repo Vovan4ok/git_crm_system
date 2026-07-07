@@ -51,9 +51,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public Trainer create(Trainer trainer) {
-        User user = trainer.getUser();
-        credentialsService.assignCredentials(user);
-        trainer.setUser(user);
+        credentialsService.assignCredentials(trainer);
         trainer.setSpecialization(resolveSpecialization(trainer.getSpecialization()));
         trainer = trainerDAO.save(trainer);
         log.info("Creating the trainer record with id {}", trainer.getId());
@@ -81,7 +79,7 @@ public class TrainerServiceImpl implements TrainerService {
         authenticationService.check(username, oldPassword);
         Trainer trainer = getByUsernameOrThrow(username);
         requireNotBlank(newPassword, "password");
-        trainer.getUser().setPassword(newPassword);
+        trainer.setPassword(newPassword);
         log.info("Changing the password for the trainer with username {}", username);
         trainerDAO.update(trainer);
     }
@@ -91,10 +89,10 @@ public class TrainerServiceImpl implements TrainerService {
     public Trainer update(String username, String password, Trainer trainer) {
         authenticationService.check(username, password);
         Trainer foundTrainer = getByUsernameOrThrow(username);
-        requireNotBlank(trainer.getUser().getFirstName(), "firstName");
-        foundTrainer.getUser().setFirstName(trainer.getUser().getFirstName());
-        requireNotBlank(trainer.getUser().getLastName(), "lastName");
-        foundTrainer.getUser().setLastName(trainer.getUser().getLastName());
+        requireNotBlank(trainer.getFirstName(), "firstName");
+        foundTrainer.setFirstName(trainer.getFirstName());
+        requireNotBlank(trainer.getLastName(), "lastName");
+        foundTrainer.setLastName(trainer.getLastName());
         foundTrainer.setSpecialization(resolveSpecialization(trainer.getSpecialization()));
         log.info("Updating the trainer with username {}", username);
         return trainerDAO.update(foundTrainer);
@@ -105,11 +103,11 @@ public class TrainerServiceImpl implements TrainerService {
     public void activate(String username, String password) {
         authenticationService.check(username, password);
         Trainer foundTrainer = getByUsernameOrThrow(username);
-        if (foundTrainer.getUser().getIsActive()) {
+        if (foundTrainer.getIsActive()) {
             log.warn("Trainer with the username {} is already active", username);
             throw new IllegalStateException("Trainer with the username " + username + " is already active");
         }
-        foundTrainer.getUser().setIsActive(true);
+        foundTrainer.setIsActive(true);
         log.info("Activating the trainer with username {}", username);
         trainerDAO.update(foundTrainer);
     }
@@ -119,11 +117,11 @@ public class TrainerServiceImpl implements TrainerService {
     public void deactivate(String username, String password) {
         authenticationService.check(username, password);
         Trainer foundTrainer = getByUsernameOrThrow(username);
-        if (!foundTrainer.getUser().getIsActive()) {
+        if (!foundTrainer.getIsActive()) {
             log.warn("Trainer with the username {} is already deactivated", username);
             throw new IllegalStateException("Trainer with the username " + username + " is already inactive");
         }
-        foundTrainer.getUser().setIsActive(false);
+        foundTrainer.setIsActive(false);
         log.info("Deactivating the trainer with username {}", username);
         trainerDAO.update(foundTrainer);
     }

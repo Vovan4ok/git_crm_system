@@ -47,14 +47,14 @@ public class TrainingDAOImplTest {
 
     @BeforeEach
     public void setUp() {
-        trainee = traineeDAO.save(new Trainee(null, LocalDate.parse("2000-01-01"),
-                "addr", new User(null, "Ann", "Free", "Ann.Free", "p", true), new HashSet<>()));
-        yogaTrainer = trainerDAO.save(new Trainer(null, new TrainingType(1L, "Yoga"),
-                new User(null, "Yo", "Ga", "Yo.Ga", "p", true), new HashSet<>()));
-        Trainer cardioTrainer = trainerDAO.save(new Trainer(null, new TrainingType(2L, "Cardio"),
-                new User(null, "Car", "Dio", "Car.Dio", "p", true), new HashSet<>()));
-        Trainee bob = traineeDAO.save(new Trainee(null, LocalDate.parse("1999-05-05"),
-                "addr2", new User(null, "Bob", "Busy", "Bob.Busy", "p", true), new HashSet<>()));
+        trainee = traineeDAO.save(new Trainee(LocalDate.parse("2000-01-01"),
+                "addr", "Ann", "Free", "Ann.Free", "p", true, new HashSet<>()));
+        yogaTrainer = trainerDAO.save(new Trainer(new TrainingType(1L, "Yoga"),
+                "Yo", "Ga", "Yo.Ga", "p", true, new HashSet<>()));
+        Trainer cardioTrainer = trainerDAO.save(new Trainer(new TrainingType(2L, "Cardio"),
+                "Car", "Dio", "Car.Dio", "p", true, new HashSet<>()));
+        Trainee bob = traineeDAO.save(new Trainee(LocalDate.parse("1999-05-05"),
+                "addr2", "Bob", "Busy", "Bob.Busy", "p", true, new HashSet<>()));
         flushAndClear();
 
         trainingDAO.save(new Training(null, trainee, yogaTrainer, new TrainingType(1L, "Yoga"),

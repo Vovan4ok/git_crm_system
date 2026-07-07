@@ -41,11 +41,8 @@ public class TrainerDAOImplTest {
 
     @BeforeEach
     public void setUpTrainer() {
-        User user = new User(null, "John", "Doe", "John.Doe", "random", true);
-        trainer = new Trainer();
-        trainer.setUser(user);
-        trainer.setSpecialization(new TrainingType(1L, "Yoga"));
-        trainer.setTrainees(new HashSet<>());
+
+        trainer = new Trainer(new TrainingType(1L, "Yoga"), "John", "Doe", "John.Doe", "random", true, new HashSet<>());
     }
 
     private void flushAndClear() {
@@ -59,8 +56,8 @@ public class TrainerDAOImplTest {
         flushAndClear();
 
         Trainer reloaded = trainerDAO.findByUsername("John.Doe").orElseThrow();
-        assertNotNull(reloaded.getUser().getId());
-        assertEquals("John.Doe", reloaded.getUser().getUsername());
+        assertNotNull(reloaded.getId());
+        assertEquals("John.Doe", reloaded.getUsername());
         assertEquals("Yoga", reloaded.getSpecialization().getTrainingTypeName());
     }
 
@@ -71,7 +68,7 @@ public class TrainerDAOImplTest {
 
         Optional<Trainer> reloaded =  trainerDAO.findById(trainer.getId());
         assertTrue(reloaded.isPresent());
-        assertEquals(trainer.getUser().getUsername(), reloaded.get().getUser().getUsername());
+        assertEquals(trainer.getUsername(), reloaded.get().getUsername());
     }
 
     @Test
@@ -88,12 +85,12 @@ public class TrainerDAOImplTest {
         trainer = trainerDAO.save(trainer);
         flushAndClear();
 
-        trainer.getUser().setFirstName("Test");
+        trainer.setFirstName("Test");
         trainer = trainerDAO.update(trainer);
         flushAndClear();
 
         Trainer reloaded = trainerDAO.findById(trainer.getId()).orElseThrow();
-        assertEquals("Test", reloaded.getUser().getFirstName());
+        assertEquals("Test", reloaded.getFirstName());
     }
 
     @Test
@@ -114,8 +111,8 @@ public class TrainerDAOImplTest {
 
     @Test
     public void findUnassignedTrainers_Found() {
-        Trainer trainer1 = new Trainer(null, new TrainingType(2L, "Cardio"), new User(null, "Bob", "Busy", "Bob.Busy", "random", true), new HashSet<>());
-        Trainee trainee = new Trainee(null, LocalDate.parse("2011-08-11"), "Test address", new User(null, "Ann", "Free", "Ann.Free", "random", true), new HashSet<>());
+        Trainer trainer1 = new Trainer(new TrainingType(2L, "Cardio"), "Bob", "Busy", "Bob.Busy", "random", true, new HashSet<>());
+        Trainee trainee = new Trainee(LocalDate.parse("2011-08-11"), "Test address", "Ann", "Free", "Ann.Free", "random", true, new HashSet<>());
         trainer = trainerDAO.save(trainer);
         trainerDAO.save(trainer1);
         trainee = traineeDAO.save(trainee);
@@ -126,15 +123,15 @@ public class TrainerDAOImplTest {
         flushAndClear();
 
         List<Trainer> result = trainerDAO.findUnassignedTrainers("Ann.Free");
-        List<String> resultUsernames = result.stream().map(t -> t.getUser().getUsername()).toList();
+        List<String> resultUsernames = result.stream().map(User::getUsername).toList();
         assertTrue(resultUsernames.contains("Bob.Busy"));
         assertFalse(resultUsernames.contains("John.Doe"));
     }
 
     @Test
     public void findUnassignedTrainers_NotFound() {
-        Trainer trainer1 = new Trainer(null, new TrainingType(2L, "Cardio"), new User(null, "Bob", "Busy", "Bob.Busy", "random", true), new HashSet<>());
-        Trainee trainee = new Trainee(null, LocalDate.parse("2011-08-11"), "Test address", new User(null, "Ann", "Free", "Ann.Free", "random", true), new HashSet<>());
+        Trainer trainer1 = new Trainer(new TrainingType(2L, "Cardio"), "Bob", "Busy", "Bob.Busy", "random", true, new HashSet<>());
+        Trainee trainee = new Trainee(LocalDate.parse("2011-08-11"), "Test address", "Ann", "Free", "Ann.Free", "random", true, new HashSet<>());
         trainer = trainerDAO.save(trainer);
         trainer1 = trainerDAO.save(trainer1);
         trainee = traineeDAO.save(trainee);
@@ -145,7 +142,7 @@ public class TrainerDAOImplTest {
         flushAndClear();
 
         List<Trainer> result = trainerDAO.findUnassignedTrainers("Ann.Free");
-        List<String> resultUsernames = result.stream().map(t -> t.getUser().getUsername()).toList();
+        List<String> resultUsernames = result.stream().map(User::getUsername).toList();
         assertTrue(resultUsernames.isEmpty());
     }
 

@@ -8,7 +8,6 @@ import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
-import org.volodymyrzganiaiko.gym.crm.system.domain.User;
 import org.volodymyrzganiaiko.gym.crm.system.service.AuthenticationService;
 import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TraineeService;
@@ -54,9 +53,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public Trainee create(Trainee trainee) {
-        User user = trainee.getUser();
-        credentialsService.assignCredentials(user);
-        trainee.setUser(user);
+        credentialsService.assignCredentials(trainee);
         trainee = traineeDAO.save(trainee);
         log.info("Creating a trainee record with id {}", trainee.getId());
         return trainee;
@@ -90,7 +87,7 @@ public class TraineeServiceImpl implements TraineeService {
         authenticationService.check(username, oldPassword);
         Trainee trainee = getByUsernameOrThrow(username);
         requireNotBlank(newPassword, "password");
-        trainee.getUser().setPassword(newPassword);
+        trainee.setPassword(newPassword);
         log.info("Trainee with username {} is changing the password", username);
         traineeDAO.update(trainee);
     }
@@ -100,10 +97,10 @@ public class TraineeServiceImpl implements TraineeService {
     public Trainee update(String username, String password, Trainee trainee) {
         authenticationService.check(username, password);
         Trainee foundTrainee = getByUsernameOrThrow(username);
-        requireNotBlank(trainee.getUser().getFirstName(), "firstName");
-        foundTrainee.getUser().setFirstName(trainee.getUser().getFirstName());
-        requireNotBlank(trainee.getUser().getLastName(), "lastName");
-        foundTrainee.getUser().setLastName(trainee.getUser().getLastName());
+        requireNotBlank(trainee.getFirstName(), "firstName");
+        foundTrainee.setFirstName(trainee.getFirstName());
+        requireNotBlank(trainee.getLastName(), "lastName");
+        foundTrainee.setLastName(trainee.getLastName());
         foundTrainee.setDateOfBirth(trainee.getDateOfBirth());
         foundTrainee.setAddress(trainee.getAddress());
         log.info("Updating the trainee with username {}", username);
@@ -115,11 +112,11 @@ public class TraineeServiceImpl implements TraineeService {
     public void activate(String username, String password) {
         authenticationService.check(username, password);
         Trainee foundTrainee = getByUsernameOrThrow(username);
-        if (foundTrainee.getUser().getIsActive()) {
+        if (foundTrainee.getIsActive()) {
             log.warn("Trainee with username {} is already active", username);
             throw new IllegalStateException("Trainee with the username " + username + " is already active");
         }
-        foundTrainee.getUser().setIsActive(true);
+        foundTrainee.setIsActive(true);
         log.info("Activating the trainee with username {}", username);
 
         traineeDAO.update(foundTrainee);
@@ -130,11 +127,11 @@ public class TraineeServiceImpl implements TraineeService {
     public void deactivate(String username, String password) {
         authenticationService.check(username, password);
         Trainee foundTrainee = getByUsernameOrThrow(username);
-        if (!foundTrainee.getUser().getIsActive()) {
+        if (!foundTrainee.getIsActive()) {
             log.warn("Trainee with username {} is already deactivated", username);
             throw new IllegalStateException("Trainee with the username " + username + " is already inactive");
         }
-        foundTrainee.getUser().setIsActive(false);
+        foundTrainee.setIsActive(false);
         log.info("Deactivating the trainee with username {}", username);
         traineeDAO.update(foundTrainee);
     }

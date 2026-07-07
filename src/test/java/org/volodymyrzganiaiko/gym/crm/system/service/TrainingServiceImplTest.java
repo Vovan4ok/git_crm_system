@@ -39,8 +39,10 @@ public class TrainingServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        Trainee trainee = new Trainee(1L, LocalDate.parse("2003-08-11"), "Test address", new User(1L, "John", "Doe", "John.Doe", "random", true), new HashSet<>());
-        Trainer trainer = new Trainer(1L, new TrainingType(1L, "Yoga"), new User(2L, "Test", "Test", "Test.Test", "random", true), new HashSet<>());
+        Trainee trainee = new Trainee(LocalDate.parse("2003-08-11"), "Test address", "John", "Doe", "John.Doe", "random", true, new HashSet<>());
+        trainee.setId(1L);
+        Trainer trainer = new Trainer(new TrainingType(1L, "Yoga"), "Test", "Test", "Test.Test", "random", true, new HashSet<>());
+        trainer.setId(2L);
         training = new Training();
         training.setId(1L);
         training.setTrainee(trainee);
@@ -55,10 +57,10 @@ public class TrainingServiceImplTest {
     public void addTraining_success() {
         when(trainingDAO.save(any(Training.class))).thenReturn(training);
 
-        trainingService.addTraining(training.getTrainee().getUser().getUsername(), training.getTrainee().getUser().getPassword(), training);
+        trainingService.addTraining(training.getTrainee().getUsername(), training.getTrainee().getPassword(), training);
 
         verify(trainingDAO).save(training);
-        verify(authenticationService).check(training.getTrainee().getUser().getUsername(), training.getTrainee().getUser().getPassword());
+        verify(authenticationService).check(training.getTrainee().getUsername(), training.getTrainee().getPassword());
     }
 
     @ParameterizedTest(name = "invalid field: {0}")

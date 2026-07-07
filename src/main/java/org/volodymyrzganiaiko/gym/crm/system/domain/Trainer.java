@@ -15,32 +15,24 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Trainer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "trainer_id")
-    private Long id;
-
+public class Trainer extends User {
     @ManyToOne
     @JoinColumn(name = "training_type_id")
     private TrainingType specialization;
 
-    @OneToOne(cascade =  CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @ManyToMany(mappedBy = "trainers")
     private Set<Trainee> trainees = new HashSet<>();
 
-    public Trainer(TrainingType specialization, User user) {
+    public Trainer(TrainingType specialization, String firstName, String lastName, String username, String password, Boolean isActive, Set<Trainee> trainees) {
+        super(null, firstName, lastName, username, password, isActive);
         this.specialization = specialization;
-        this.user = user;
+        this.trainees = trainees;
     }
 
     @Override
     public String toString() {
         return "Trainer{" +
-                "id=" + id +
+                "id=" + getId() +
                 '}';
     }
 }

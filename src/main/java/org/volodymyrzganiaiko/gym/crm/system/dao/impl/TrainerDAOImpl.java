@@ -41,7 +41,7 @@ public class TrainerDAOImpl implements TrainerDAO {
     @Override
     public Optional<Trainer> findByUsername(String username) {
         Session session = sessionFactory.getCurrentSession();
-        return session.createQuery("from Trainer t where t.user.username = :username", Trainer.class).setParameter("username", username).uniqueResultOptional();
+        return session.createQuery("from Trainer t where t.username = :username", Trainer.class).setParameter("username", username).uniqueResultOptional();
     }
 
     @Override
@@ -55,7 +55,7 @@ public class TrainerDAOImpl implements TrainerDAO {
         Session session = sessionFactory.getCurrentSession();
         return session.createQuery(
                 "select t from Trainer t where t.id not in " +
-                        "(select tr.id from Trainee e join e.trainers tr where e.user.username = :username)",
+                        "(select tr.id from Trainee e join e.trainers tr where e.username = :username)",
                 Trainer.class).setParameter("username", traineeUsername).list();
     }
 }

@@ -6,10 +6,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
-import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
+import org.volodymyrzganiaiko.gym.crm.system.dao.UserDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
-import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.User;
 import org.volodymyrzganiaiko.gym.crm.system.utils.CredentialsGenerator;
 
@@ -24,10 +22,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class CredentialsServiceTest {
     @Mock
-    private TraineeDAO traineeDAO;
-
-    @Mock
-    private TrainerDAO trainerDAO;
+    private UserDAO userDAO;
 
     @Mock
     private CredentialsGenerator credentialsGenerator;
@@ -36,9 +31,8 @@ public class CredentialsServiceTest {
     private CredentialsService credentialsService;
 
     @Test
-    void generateUsername_collectsUsernamesFromBothDaos_andDelegates() {
-        when(traineeDAO.findAll()).thenReturn(List.of(new Trainee(null, null, null, new User(null, null, null, "A.One", null, true), null)));
-        when(trainerDAO.findAll()).thenReturn(List.of(new Trainer(null, null, new User(null, null, null, "B.Two", null, true), null)));
+    void generateUsername_collectsUsernames_andDelegates() {
+        when(userDAO.findAll()).thenReturn(List.of(new Trainee(null, null, null, null, "A.One", null, true, null), new Trainee(null, null, null, null, "B.Two", null, true, null)));
         when(credentialsGenerator.generateUsername(any(), any())).thenReturn("A.One.1");
 
         String result = credentialsService.generateUsername(new User(1L,"A","One",null,null,true));

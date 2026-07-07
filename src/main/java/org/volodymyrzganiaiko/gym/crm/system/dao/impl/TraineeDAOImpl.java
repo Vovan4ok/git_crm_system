@@ -54,7 +54,7 @@ public class TraineeDAOImpl implements TraineeDAO {
     @Override
     public Optional<Trainee> findByUsername(String username) {
         Session session = sessionFactory.getCurrentSession();
-        return session.createQuery("from Trainee t where t.user.username = :username", Trainee.class).setParameter("username", username).uniqueResultOptional();
+        return session.createQuery("from Trainee t where t.username = :username", Trainee.class).setParameter("username", username).uniqueResultOptional();
     }
 
     @Override

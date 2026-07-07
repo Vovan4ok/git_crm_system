@@ -11,9 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.volodymyrzganiaiko.gym.crm.system.dao.DaoTestConfig;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
-import org.volodymyrzganiaiko.gym.crm.system.domain.User;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,11 +32,7 @@ public class TraineeDAOImplTest {
 
     @BeforeEach
     public void setUpTrainee() {
-        User user = new User(null, "John", "Doe", "John.Doe", "random", true);
-        trainee = new Trainee();
-        trainee.setUser(user);
-        trainee.setAddress("Test address");
-        trainee.setDateOfBirth(LocalDate.parse("2003-11-08"));
+        trainee = new Trainee(LocalDate.parse("2003-11-08"), "Test address", "John", "Doe", "John.Doe", "random", true, new HashSet<>());
     }
 
     private void flushAndClear() {
@@ -50,8 +46,8 @@ public class TraineeDAOImplTest {
         flushAndClear();
 
         Trainee reloaded = traineeDAO.findById(result.getId()).orElseThrow();
-        assertNotNull(reloaded.getUser().getId());
-        assertEquals("John.Doe", reloaded.getUser().getUsername());
+        assertNotNull(reloaded.getId());
+        assertEquals("John.Doe", reloaded.getUsername());
         assertEquals("Test address", reloaded.getAddress());
     }
 

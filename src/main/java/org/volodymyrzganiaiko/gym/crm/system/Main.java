@@ -6,6 +6,7 @@ import org.volodymyrzganiaiko.gym.crm.system.domain.*;
 import org.volodymyrzganiaiko.gym.crm.system.facade.GymFacade;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 
 public class Main {
@@ -15,36 +16,31 @@ public class Main {
 
 
             /////Trainees
-            Trainee trainee = new Trainee();
             User user =  new User();
             user.setFirstName("John");
             user.setLastName("Doe");
-            trainee.setUser(user);
-            trainee.setDateOfBirth(LocalDate.parse("2003-11-08"));
-            trainee.setAddress("Test address");
+            Trainee trainee = new Trainee(LocalDate.parse("2003-11-08"), "Test address", user.getFirstName(), user.getLastName(), user.getUsername(), user.getPassword(), user.getIsActive(),  new HashSet<>());
 
             System.out.println(gymFacade.findAllTrainees().size());
             trainee = gymFacade.createTrainee(trainee);
             System.out.println(gymFacade.findAllTrainees().size());
             System.out.println(gymFacade.findTraineeById(trainee.getId()));
             trainee.setAddress("Test address 2");
-            System.out.println(gymFacade.updateTrainee(trainee.getUser().getUsername(), trainee.getUser().getPassword(), trainee));
+            System.out.println(gymFacade.updateTrainee(trainee.getUsername(), trainee.getPassword(), trainee));
             System.out.println(gymFacade.findTraineeById(trainee.getId()));
 
 
             ////Trainers
-            Trainer trainer = new Trainer();
             User user2 = new  User();
             user2.setFirstName("Volodymyr");
             user2.setLastName("Zganiaiko");
-            trainer.setUser(user2);
-            trainer.setSpecialization(new TrainingType(1L, "Cross-fit"));
+            Trainer trainer = new Trainer(new TrainingType(1L, "Cross-fit"), user.getFirstName(), user.getLastName(), user.getUsername(), user.getPassword(), user.getIsActive(), new HashSet<>());
             System.out.println(gymFacade.findAllTrainers().size());
             trainer = gymFacade.createTrainer(trainer);
             System.out.println(gymFacade.findAllTrainers().size());
             System.out.println(gymFacade.findTrainerById(trainer.getId()));
             trainer.setSpecialization(new TrainingType(2L, "Yoga"));
-            System.out.println(gymFacade.updateTrainer(trainer.getUser().getUsername(), trainer.getUser().getPassword(), trainer));
+            System.out.println(gymFacade.updateTrainer(trainer.getUsername(), trainer.getPassword(), trainer));
             System.out.println(gymFacade.findTrainerById(trainer.getId()));
 
 
@@ -58,29 +54,29 @@ public class Main {
             training.setTrainingDurationInMinutes(90);
 
             System.out.println(gymFacade.findAllTrainings().size());
-            training = gymFacade.createTraining(trainer.getUser().getUsername(), trainer.getUser().getPassword(), training);
+            training = gymFacade.createTraining(trainer.getUsername(), trainer.getPassword(), training);
             System.out.println(gymFacade.findAllTrainings().size());
             System.out.println(gymFacade.findTrainingById(training.getId()));
 
-            List<Training> traineeTrainings = gymFacade.getTraineeTrainings(trainee.getUser().getUsername(), trainee.getUser().getPassword(), null, null, trainer.getUser().getUsername(), null);
+            List<Training> traineeTrainings = gymFacade.getTraineeTrainings(trainee.getUsername(), trainee.getPassword(), null, null, trainer.getUsername(), null);
             System.out.println(traineeTrainings);
 
-            List<Training> trainerTrainings = gymFacade.getTrainerTrainings(trainer.getUser().getUsername(), trainer.getUser().getPassword(), null, null, trainee.getUser().getUsername());
+            List<Training> trainerTrainings = gymFacade.getTrainerTrainings(trainer.getUsername(), trainer.getPassword(), null, null, trainee.getUsername());
             System.out.println(trainerTrainings);
 
-            List<Trainer> unassignedTrainers = gymFacade.getUnassignedTrainers(trainee.getUser().getUsername(), trainee.getUser().getPassword());
+            List<Trainer> unassignedTrainers = gymFacade.getUnassignedTrainers(trainee.getUsername(), trainee.getPassword());
             System.out.println(unassignedTrainers);
 
-            gymFacade.changeTraineePassword(trainee.getUser().getUsername(), trainee.getUser().getPassword(), "random");
-            gymFacade.changeTrainerPassword(trainer.getUser().getUsername(), trainer.getUser().getPassword(), "random");
+            gymFacade.changeTraineePassword(trainee.getUsername(), trainee.getPassword(), "random");
+            gymFacade.changeTrainerPassword(trainer.getUsername(), trainer.getPassword(), "random");
 
             trainee = gymFacade.findTraineeById(trainee.getId()).get();
             trainer = gymFacade.findTrainerById(trainer.getId()).get();
 
-            gymFacade.deactivateTrainee(trainee.getUser().getUsername(), trainee.getUser().getPassword());
-            gymFacade.deactivateTrainer(trainer.getUser().getUsername(), trainer.getUser().getPassword());
+            gymFacade.deactivateTrainee(trainee.getUsername(), trainee.getPassword());
+            gymFacade.deactivateTrainer(trainer.getUsername(), trainer.getPassword());
 
-            gymFacade.deleteTraineeByUsername(trainee.getUser().getUsername(), trainee.getUser().getPassword());
+            gymFacade.deleteTraineeByUsername(trainee.getUsername(), trainee.getPassword());
         }
     }
 }

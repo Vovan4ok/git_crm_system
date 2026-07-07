@@ -70,7 +70,7 @@ public class TrainingDAOImpl implements TrainingDAO {
                                             String traineeUsername, String trainerUsername, LocalDate from, LocalDate to, String trainingTypeName) {
         List<Predicate> predicates = new ArrayList<>();
         if (traineeUsername != null) {
-            predicates.add(cb.equal(root.get("trainee").get("user").get("username"), traineeUsername));
+            predicates.add(cb.equal(root.get("trainee").get("username"), traineeUsername));
         }
         if (from != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("trainingDate"), from));
@@ -79,7 +79,7 @@ public class TrainingDAOImpl implements TrainingDAO {
             predicates.add(cb.lessThanOrEqualTo(root.get("trainingDate"), to));
         }
         if (trainerUsername != null) {
-            predicates.add(cb.equal(root.get("trainer").get("user").get("username"), trainerUsername));
+            predicates.add(cb.equal(root.get("trainer").get("username"), trainerUsername));
         }
         if (trainingTypeName != null) {
             predicates.add(cb.equal(root.get("trainingType").get("trainingTypeName"), trainingTypeName));

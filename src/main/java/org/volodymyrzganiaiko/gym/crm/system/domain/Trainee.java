@@ -16,21 +16,12 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Trainee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
-
+public class Trainee extends User {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
     @Column(name = "address")
     private String address;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -41,16 +32,17 @@ public class Trainee {
     private Set<Trainer> trainers = new HashSet<>();
 
 
-    public Trainee(LocalDate dateOfBirth, String address, User user) {
+    public Trainee(LocalDate dateOfBirth, String address, String firstName, String lastName, String username, String password, Boolean isActive, Set<Trainer> trainers) {
+        super(null, firstName, lastName, username, password, isActive);
         this.dateOfBirth = dateOfBirth;
         this.address = address;
-        this.user = user;
+        this.trainers = trainers;
     }
 
     @Override
     public String toString() {
         return "Trainee{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", dateOfBirth=" + dateOfBirth +
                 ", address='" + address + '\'' +
                 '}';

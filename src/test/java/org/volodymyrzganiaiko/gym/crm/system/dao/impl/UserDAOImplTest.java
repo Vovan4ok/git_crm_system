@@ -40,6 +40,15 @@ public class UserDAOImplTest {
     private SessionFactory sessionFactory;
 
     @Test
+    public void save2UsersWithSameUsernames_throwsException() {
+        traineeDAO.save(new Trainee(LocalDate.parse("2003-11-08"), "Test address", "John", "Doe", "John.Doe", "random", true, new HashSet<>()));
+        trainerDAO.save(new Trainer(new TrainingType(1L, "Yoga"), "John", "Doe", "John.Doe", "random", true, new HashSet<>()));
+
+
+        assertThrows(Exception.class, this::flushAndClear);
+    }
+
+    @Test
     public void findByUsername_traineeFound() {
         traineeDAO.save(new Trainee(LocalDate.parse("2003-11-08"), "Test address", "John", "Doe", "John.Doe", "random", true, new HashSet<>()));
         flushAndClear();
@@ -71,7 +80,7 @@ public class UserDAOImplTest {
     @Test
     public void findAll() {
         traineeDAO.save(new Trainee(LocalDate.parse("2003-11-08"), "Test address", "John", "Doe", "John.Doe", "random", true, new HashSet<>()));
-        trainerDAO.save(new Trainer(new TrainingType(1L, "Yoga"), "John", "Doe", "John.Doe", "random", true, new HashSet<>()));
+        trainerDAO.save(new Trainer(new TrainingType(1L, "Yoga"), "John", "Doe", "John.Doe.1", "random", true, new HashSet<>()));
         flushAndClear();
 
         List<User> result = userDAO.findAll();

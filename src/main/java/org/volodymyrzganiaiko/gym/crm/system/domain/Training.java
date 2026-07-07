@@ -13,7 +13,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Training {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "training_seq")
+    @SequenceGenerator(name = "training_seq", sequenceName = "training_seq", allocationSize = 1)
     @Column(name = "training_id")
     private Long id;
 

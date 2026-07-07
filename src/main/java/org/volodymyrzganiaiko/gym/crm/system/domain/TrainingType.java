@@ -15,7 +15,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class TrainingType {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "training_type_id")
     private Long id;
 

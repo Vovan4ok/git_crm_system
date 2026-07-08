@@ -29,7 +29,7 @@ public class Main {
             System.out.println(gymFacade.findAllTrainees().size());
             System.out.println(gymFacade.findTraineeById(trainee.getId()));
             trainee.setAddress("Test address 2");
-            System.out.println(gymFacade.updateTrainee(new Credentials(trainee.getUsername(), trainee.getPassword()), trainee));
+            System.out.println(gymFacade.updateTrainee(new Credentials(traineeRegistrationDTO.trainee().getUsername(), traineeRegistrationDTO.password()), traineeRegistrationDTO.trainee()));
             System.out.println(gymFacade.findTraineeById(trainee.getId()));
 
 
@@ -43,7 +43,7 @@ public class Main {
             System.out.println(gymFacade.findAllTrainers().size());
             System.out.println(gymFacade.findTrainerById(trainer.getId()));
             trainer.setSpecialization(new TrainingType(2L, "Yoga"));
-            System.out.println(gymFacade.updateTrainer(new Credentials(trainer.getUsername(), trainer.getPassword()), trainer));
+            System.out.println(gymFacade.updateTrainer(new Credentials(trainerRegistrationDTO.trainer().getUsername(), trainerRegistrationDTO.password()), trainerRegistrationDTO.trainer()));
             System.out.println(gymFacade.findTrainerById(trainer.getId()));
 
 
@@ -57,29 +57,29 @@ public class Main {
             training.setTrainingDurationInMinutes(90);
 
             System.out.println(gymFacade.findAllTrainings().size());
-            training = gymFacade.createTraining(new Credentials(trainer.getUsername(), trainer.getPassword()), training);
+            training = gymFacade.createTraining(new Credentials(trainerRegistrationDTO.trainer().getUsername(), trainerRegistrationDTO.password()), training);
             System.out.println(gymFacade.findAllTrainings().size());
             System.out.println(gymFacade.findTrainingById(training.getId()));
 
-            List<Training> traineeTrainings = gymFacade.getTraineeTrainings(new Credentials(trainee.getUsername(), trainee.getPassword()), null, null, trainer.getUsername(), null);
+            List<Training> traineeTrainings = gymFacade.getTraineeTrainings(new Credentials(traineeRegistrationDTO.trainee().getUsername(), traineeRegistrationDTO.password()), null, null, trainer.getUsername(), null);
             System.out.println(traineeTrainings);
 
-            List<Training> trainerTrainings = gymFacade.getTrainerTrainings(new Credentials(trainer.getUsername(), trainer.getPassword()), null, null, trainee.getUsername());
+            List<Training> trainerTrainings = gymFacade.getTrainerTrainings(new Credentials(trainerRegistrationDTO.trainer().getUsername(), trainerRegistrationDTO.password()), null, null, trainee.getUsername());
             System.out.println(trainerTrainings);
 
-            List<Trainer> unassignedTrainers = gymFacade.getUnassignedTrainers(new Credentials(trainee.getUsername(), trainee.getPassword()));
+            List<Trainer> unassignedTrainers = gymFacade.getUnassignedTrainers(new Credentials(traineeRegistrationDTO.trainee().getUsername(), traineeRegistrationDTO.password()));
             System.out.println(unassignedTrainers);
 
-            gymFacade.changeTraineePassword(new Credentials(trainee.getUsername(), trainee.getPassword()), "random");
-            gymFacade.changeTrainerPassword(new Credentials(trainer.getUsername(), trainer.getPassword()), "random");
+            gymFacade.changeTraineePassword(new Credentials(traineeRegistrationDTO.trainee().getUsername(), traineeRegistrationDTO.password()), "random");
+            gymFacade.changeTrainerPassword(new Credentials(trainerRegistrationDTO.trainer().getUsername(), trainerRegistrationDTO.password()), "random");
 
             trainee = gymFacade.findTraineeById(trainee.getId()).get();
             trainer = gymFacade.findTrainerById(trainer.getId()).get();
 
-            gymFacade.deactivateTrainee(new Credentials(trainee.getUsername(), trainee.getPassword()));
-            gymFacade.deactivateTrainer(new Credentials(trainer.getUsername(), trainer.getPassword()));
+            gymFacade.deactivateTrainee(new Credentials(trainee.getUsername(), "random"));
+            gymFacade.deactivateTrainer(new Credentials(trainer.getUsername(), "random"));
 
-            gymFacade.deleteTraineeByUsername(new Credentials(trainee.getUsername(), trainee.getPassword()));
+            gymFacade.deleteTraineeByUsername(new Credentials(trainee.getUsername(), "random"));
         }
     }
 }

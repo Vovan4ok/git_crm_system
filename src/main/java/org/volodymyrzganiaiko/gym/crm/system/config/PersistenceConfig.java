@@ -1,9 +1,11 @@
 package org.volodymyrzganiaiko.gym.crm.system.config;
 
+import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
@@ -51,6 +53,7 @@ public class PersistenceConfig {
         return dataSource;
     }
 
+    @DependsOn("flyway")
     @Bean
     public LocalSessionFactoryBean localSessionFactoryBean() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
@@ -70,4 +73,10 @@ public class PersistenceConfig {
         return new HibernateTransactionManager(sessionFactory);
     }
 
+    @Bean(initMethod = "migrate")
+    public Flyway flyway() {
+        return Flyway.configure()
+                .dataSource(dataSource())
+                .load();
+    }
 }

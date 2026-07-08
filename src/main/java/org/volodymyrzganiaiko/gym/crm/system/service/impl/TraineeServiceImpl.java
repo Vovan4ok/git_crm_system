@@ -9,6 +9,7 @@ import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
+import org.volodymyrzganiaiko.gym.crm.system.domain.Training;
 import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
 import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.service.AuthenticationService;
@@ -17,6 +18,9 @@ import org.volodymyrzganiaiko.gym.crm.system.service.TraineeService;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +35,7 @@ public class TraineeServiceImpl implements TraineeService {
     private CredentialsService credentialsService;
     private AuthenticationService authenticationService;
     private PasswordEncoder passwordEncoder;
+    private Validator validator;
 
     private static final Logger log =  LoggerFactory.getLogger(TraineeServiceImpl.class);
 
@@ -59,10 +64,19 @@ public class TraineeServiceImpl implements TraineeService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Autowired
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+
     @Override
     @Transactional
     public TraineeRegistrationDTO create(Trainee trainee) {
         String password = credentialsService.assignCredentials(trainee);
+        Set<ConstraintViolation<Trainee>> violations = validator.validate(trainee);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
         trainee = traineeDAO.save(trainee);
         log.info("Creating a trainee record with id {}", trainee.getId());
         return new TraineeRegistrationDTO(trainee, password);
@@ -106,12 +120,14 @@ public class TraineeServiceImpl implements TraineeService {
     public Trainee update(Credentials credentials, Trainee trainee) {
         authenticationService.check(credentials);
         Trainee foundTrainee = getByUsernameOrThrow(credentials.username());
-        requireNotBlank(trainee.getFirstName(), "firstName");
         foundTrainee.setFirstName(trainee.getFirstName());
-        requireNotBlank(trainee.getLastName(), "lastName");
         foundTrainee.setLastName(trainee.getLastName());
         foundTrainee.setDateOfBirth(trainee.getDateOfBirth());
         foundTrainee.setAddress(trainee.getAddress());
+        Set<ConstraintViolation<Trainee>> violations = validator.validate(foundTrainee);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
         log.info("Updating the trainee with username {}", credentials.username());
         return traineeDAO.update(foundTrainee);
     }

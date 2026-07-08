@@ -23,6 +23,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -51,6 +54,8 @@ public class TraineeServiceImplTest {
 
     @BeforeEach
     public void setUp() {
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        traineeService.setValidator(validator);
         trainee = new Trainee(null, null, "John", "Doe", "John.Doe", "random", true, new HashSet<>());
         trainee.setId(1L);
     }
@@ -149,7 +154,7 @@ public class TraineeServiceImplTest {
 
         trainee.setFirstName("");
 
-        assertThrows(IllegalArgumentException.class, () -> traineeService.update(new Credentials(trainee.getUsername(), trainee.getPassword()), trainee));
+        assertThrows(ConstraintViolationException.class, () -> traineeService.update(new Credentials(trainee.getUsername(), trainee.getPassword()), trainee));
         verify(traineeDAO, never()).update(any());
     }
 

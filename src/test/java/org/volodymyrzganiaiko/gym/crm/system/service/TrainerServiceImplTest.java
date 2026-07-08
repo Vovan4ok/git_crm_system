@@ -22,6 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -54,6 +57,8 @@ public class TrainerServiceImplTest {
 
     @BeforeEach
     public void setUp() {
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        trainerService.setValidator(validator);
         trainer = new Trainer(new TrainingType(1L, "Yoga"), "John", "Doe", "John.Doe", "random", true, new HashSet<>());
         trainer.setId(1L);
     }
@@ -165,10 +170,11 @@ public class TrainerServiceImplTest {
     @Test
     public void update_blankFirstName_throwsException() {
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
+        when(trainingTypeDAO.findById(1L)).thenReturn(Optional.of(new TrainingType(1L, "Yoga")));
 
         trainer.setFirstName("");
 
-        assertThrows(IllegalArgumentException.class, () -> trainerService.update(new Credentials(trainer.getUsername(), trainer.getPassword()), trainer));
+        assertThrows(ConstraintViolationException.class, () -> trainerService.update(new Credentials(trainer.getUsername(), trainer.getPassword()), trainer));
         verify(trainerDAO, never()).update(any());
     }
 

@@ -12,17 +12,19 @@ import org.volodymyrzganiaiko.gym.crm.system.service.TrainingService;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
-import static org.volodymyrzganiaiko.gym.crm.system.utils.ValueValidator.requireNotBlank;
-import static org.volodymyrzganiaiko.gym.crm.system.utils.ValueValidator.requireNotNull;
+import java.util.Set;
 
 @Service
 public class TrainingServiceImpl implements TrainingService {
     private TrainingDAO trainingDAO;
     private AuthenticationService authenticationService;
+    private Validator validator;
 
     private static final Logger log = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
@@ -36,19 +38,19 @@ public class TrainingServiceImpl implements TrainingService {
         this.authenticationService = authenticationService;
     }
 
+    @Autowired
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+
     @Override
     @Transactional
     public Training addTraining(Credentials credentials, Training training) {
         authenticationService.check(credentials);
-        requireNotNull(training.getTrainee(), "trainee");
-        requireNotNull(training.getTrainee().getId(), "traineeId");
-        requireNotNull(training.getTrainer(), "trainer");
-        requireNotNull(training.getTrainer().getId(), "trainerId");
-        requireNotNull(training.getTrainingType(), "trainingType");
-        requireNotNull(training.getTrainingType().getId(), "trainingTypeId");
-        requireNotBlank(training.getTrainingName(), "trainingName");
-        requireNotNull(training.getTrainingDate(), "trainingDate");
-        requireNotNull(training.getTrainingDurationInMinutes(), "trainingDurationInMinutes");
+        Set<ConstraintViolation<Training>> violations = validator.validate(training);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
         training = trainingDAO.save(training);
         log.info("Creating the training record with id {}", training.getId());
         return training;

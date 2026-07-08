@@ -14,6 +14,9 @@ import org.volodymyrzganiaiko.gym.crm.system.domain.*;
 import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
 import org.volodymyrzganiaiko.gym.crm.system.service.impl.TrainingServiceImpl;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +43,8 @@ public class TrainingServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        trainingService.setValidator(validator);
         Trainee trainee = new Trainee(LocalDate.parse("2003-08-11"), "Test address", "John", "Doe", "John.Doe", "random", true, new HashSet<>());
         trainee.setId(1L);
         Trainer trainer = new Trainer(new TrainingType(1L, "Yoga"), "Test", "Test", "Test.Test", "random", true, new HashSet<>());
@@ -69,7 +74,7 @@ public class TrainingServiceImplTest {
     public void addTraining_throwsException(String caseName, Consumer<Training> corrupt) {
         corrupt.accept(training);
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ConstraintViolationException.class,
                 () -> trainingService.addTraining(new Credentials("John.Doe", "random"), training));
         verifyNoInteractions(trainingDAO);
     }

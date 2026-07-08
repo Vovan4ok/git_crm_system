@@ -16,8 +16,13 @@ import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainerService;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.volodymyrzganiaiko.gym.crm.system.utils.ValueValidator.requireNotBlank;
 
@@ -28,6 +33,7 @@ public class TrainerServiceImpl implements TrainerService {
     private CredentialsService credentialsService;
     private AuthenticationService authenticationService;
     private PasswordEncoder passwordEncoder;
+    private Validator validator;
 
     private static final Logger log = LoggerFactory.getLogger(TrainerServiceImpl.class);
 
@@ -56,11 +62,20 @@ public class TrainerServiceImpl implements TrainerService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Autowired
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+
     @Override
     @Transactional
     public TrainerRegistrationDTO create(Trainer trainer) {
         String password = credentialsService.assignCredentials(trainer);
         trainer.setSpecialization(resolveSpecialization(trainer.getSpecialization()));
+        Set<ConstraintViolation<Trainer>> violations = validator.validate(trainer);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
         trainer = trainerDAO.save(trainer);
         log.info("Creating the trainer record with id {}", trainer.getId());
         return new TrainerRegistrationDTO(trainer, password);
@@ -97,11 +112,13 @@ public class TrainerServiceImpl implements TrainerService {
     public Trainer update(Credentials credentials, Trainer trainer) {
         authenticationService.check(credentials);
         Trainer foundTrainer = getByUsernameOrThrow(credentials.username());
-        requireNotBlank(trainer.getFirstName(), "firstName");
         foundTrainer.setFirstName(trainer.getFirstName());
-        requireNotBlank(trainer.getLastName(), "lastName");
         foundTrainer.setLastName(trainer.getLastName());
         foundTrainer.setSpecialization(resolveSpecialization(trainer.getSpecialization()));
+        Set<ConstraintViolation<Trainer>> violations = validator.validate(foundTrainer);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
         log.info("Updating the trainer with username {}", credentials.username());
         return trainerDAO.update(foundTrainer);
     }

@@ -3,11 +3,13 @@ package org.volodymyrzganiaiko.gym.crm.system.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
+import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.service.AuthenticationService;
 import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TraineeService;
@@ -27,6 +29,7 @@ public class TraineeServiceImpl implements TraineeService {
     private TrainerDAO trainerDAO;
     private CredentialsService credentialsService;
     private AuthenticationService authenticationService;
+    private PasswordEncoder passwordEncoder;
 
     private static final Logger log =  LoggerFactory.getLogger(TraineeServiceImpl.class);
 
@@ -50,13 +53,18 @@ public class TraineeServiceImpl implements TraineeService {
         this.authenticationService = authenticationService;
     }
 
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Override
     @Transactional
-    public Trainee create(Trainee trainee) {
-        credentialsService.assignCredentials(trainee);
+    public TraineeRegistrationDTO create(Trainee trainee) {
+        String password = credentialsService.assignCredentials(trainee);
         trainee = traineeDAO.save(trainee);
         log.info("Creating a trainee record with id {}", trainee.getId());
-        return trainee;
+        return new TraineeRegistrationDTO(trainee, password);
     }
 
     @Override
@@ -87,7 +95,7 @@ public class TraineeServiceImpl implements TraineeService {
         authenticationService.check(username, oldPassword);
         Trainee trainee = getByUsernameOrThrow(username);
         requireNotBlank(newPassword, "password");
-        trainee.setPassword(newPassword);
+        trainee.setPassword(passwordEncoder.encode(newPassword));
         log.info("Trainee with username {} is changing the password", username);
         traineeDAO.update(trainee);
     }

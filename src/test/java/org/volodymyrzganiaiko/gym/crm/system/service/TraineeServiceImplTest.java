@@ -6,11 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.User;
+import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.exceptions.AuthenticationException;
 import org.volodymyrzganiaiko.gym.crm.system.service.impl.TraineeServiceImpl;
 
@@ -38,6 +40,9 @@ public class TraineeServiceImplTest {
     @Mock
     private AuthenticationService authenticationService;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private TraineeServiceImpl traineeService;
 
@@ -56,15 +61,15 @@ public class TraineeServiceImplTest {
             u.setUsername("John.Doe");
             u.setPassword("random");
             u.setIsActive(true);
-            return null;
+            return "random";
         }).when(credentialsService).assignCredentials(any(User.class));
         when(traineeDAO.save(any(Trainee.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Trainee result = traineeService.create(trainee);
+        TraineeRegistrationDTO result = traineeService.create(trainee);
 
-        assertTrue(result.getIsActive());
-        assertEquals("John.Doe", result.getUsername());
-        assertEquals("random", result.getPassword());
+        assertTrue(result.trainee().getIsActive());
+        assertEquals("John.Doe", result.trainee().getUsername());
+        assertEquals("random", result.password());
         verify(traineeDAO).save(trainee);
         verifyNoInteractions(authenticationService);
         verify(credentialsService).assignCredentials(trainee);
@@ -91,6 +96,7 @@ public class TraineeServiceImplTest {
     @Test
     public void changePassword_success() {
         when(traineeDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainee));
+        when(passwordEncoder.encode("random1")).thenReturn("random1");
 
         traineeService.changePassword("John.Doe", "random", "random1");
 

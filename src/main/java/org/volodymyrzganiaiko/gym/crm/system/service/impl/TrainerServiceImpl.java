@@ -3,12 +3,13 @@ package org.volodymyrzganiaiko.gym.crm.system.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainingTypeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
-import org.volodymyrzganiaiko.gym.crm.system.domain.User;
+import org.volodymyrzganiaiko.gym.crm.system.dto.TrainerRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.service.AuthenticationService;
 import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainerService;
@@ -25,6 +26,7 @@ public class TrainerServiceImpl implements TrainerService {
     private TrainingTypeDAO trainingTypeDAO;
     private CredentialsService credentialsService;
     private AuthenticationService authenticationService;
+    private PasswordEncoder passwordEncoder;
 
     private static final Logger log = LoggerFactory.getLogger(TrainerServiceImpl.class);
 
@@ -48,14 +50,19 @@ public class TrainerServiceImpl implements TrainerService {
         this.authenticationService = authenticationService;
     }
 
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Override
     @Transactional
-    public Trainer create(Trainer trainer) {
-        credentialsService.assignCredentials(trainer);
+    public TrainerRegistrationDTO create(Trainer trainer) {
+        String password = credentialsService.assignCredentials(trainer);
         trainer.setSpecialization(resolveSpecialization(trainer.getSpecialization()));
         trainer = trainerDAO.save(trainer);
         log.info("Creating the trainer record with id {}", trainer.getId());
-        return trainer;
+        return new TrainerRegistrationDTO(trainer, password);
     }
 
     @Override
@@ -79,7 +86,7 @@ public class TrainerServiceImpl implements TrainerService {
         authenticationService.check(username, oldPassword);
         Trainer trainer = getByUsernameOrThrow(username);
         requireNotBlank(newPassword, "password");
-        trainer.setPassword(newPassword);
+        trainer.setPassword(passwordEncoder.encode(newPassword));
         log.info("Changing the password for the trainer with username {}", username);
         trainerDAO.update(trainer);
     }

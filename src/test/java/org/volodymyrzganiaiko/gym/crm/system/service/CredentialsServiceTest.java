@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.volodymyrzganiaiko.gym.crm.system.dao.UserDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.User;
@@ -26,6 +27,9 @@ public class CredentialsServiceTest {
 
     @Mock
     private CredentialsGenerator credentialsGenerator;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private CredentialsService credentialsService;

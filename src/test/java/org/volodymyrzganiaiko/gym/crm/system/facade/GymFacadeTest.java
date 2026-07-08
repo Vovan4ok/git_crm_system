@@ -6,6 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.volodymyrzganiaiko.gym.crm.system.domain.*;
+import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
+import org.volodymyrzganiaiko.gym.crm.system.dto.TrainerRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.service.TraineeService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainerService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainingService;
@@ -43,12 +45,13 @@ class GymFacadeTest {
     void createTrainee() {
         Trainee returnTrainee = new Trainee(null, null, null, null, null, null, null, null);
         returnTrainee.setId(1L);
-        when(traineeService.create(any())).thenReturn(returnTrainee);
+        TraineeRegistrationDTO shouldReturnDTO = new TraineeRegistrationDTO(returnTrainee, "test");
+        when(traineeService.create(any())).thenReturn(shouldReturnDTO);
         Trainee input = new Trainee();
 
-        Trainee result = gymFacade.createTrainee(input);
+        TraineeRegistrationDTO result = gymFacade.createTrainee(input);
 
-        assertEquals(1L, result.getId());
+        assertEquals(1L, result.trainee().getId());
         verify(traineeService).create(input);
     }
 
@@ -132,10 +135,10 @@ class GymFacadeTest {
 
     @Test
     void createTrainer() {
-        when(trainerService.create(any())).thenReturn(new Trainer());
+        when(trainerService.create(any())).thenReturn(new TrainerRegistrationDTO(new Trainer(), "test"));
         Trainer input = new Trainer();
 
-        Trainer result = gymFacade.createTrainer(input);
+        TrainerRegistrationDTO result = gymFacade.createTrainer(input);
 
         assertNotNull(result);
         verify(trainerService).create(input);

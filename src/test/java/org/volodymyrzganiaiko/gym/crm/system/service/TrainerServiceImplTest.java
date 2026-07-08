@@ -6,11 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainingTypeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
 import org.volodymyrzganiaiko.gym.crm.system.domain.User;
+import org.volodymyrzganiaiko.gym.crm.system.dto.TrainerRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.exceptions.AuthenticationException;
 import org.volodymyrzganiaiko.gym.crm.system.service.impl.TrainerServiceImpl;
 
@@ -41,6 +43,9 @@ public class TrainerServiceImplTest {
     @Mock
     private AuthenticationService authenticationService;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private TrainerServiceImpl trainerService;
 
@@ -48,7 +53,6 @@ public class TrainerServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-
         trainer = new Trainer(new TrainingType(1L, "Yoga"), "John", "Doe", "John.Doe", "random", true, new HashSet<>());
         trainer.setId(1L);
     }
@@ -60,16 +64,16 @@ public class TrainerServiceImplTest {
             u.setUsername("John.Doe");
             u.setPassword("random");
             u.setIsActive(true);
-            return null;
+            return "random";
         }).when(credentialsService).assignCredentials(any(User.class));
         when(trainerDAO.save(any(Trainer.class))).thenAnswer(inv -> inv.getArgument(0));
         when(trainingTypeDAO.findById(1L)).thenReturn(Optional.of(new TrainingType(1L, "Yoga")));
 
-        Trainer result = trainerService.create(trainer);
+        TrainerRegistrationDTO result = trainerService.create(trainer);
 
-        assertTrue(result.getIsActive());
-        assertEquals("John.Doe", result.getUsername());
-        assertEquals("random", result.getPassword());
+        assertTrue(result.trainer().getIsActive());
+        assertEquals("John.Doe", result.trainer().getUsername());
+        assertEquals("random", result.password());
         verify(trainerDAO).save(trainer);
         verifyNoInteractions(authenticationService);
         verify(credentialsService).assignCredentials(trainer);
@@ -104,6 +108,7 @@ public class TrainerServiceImplTest {
     @Test
     public void changePassword_success() {
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
+        when(passwordEncoder.encode("random1")).thenReturn("random1");
 
         trainerService.changePassword("John.Doe", "random", "random1");
 

@@ -1,6 +1,7 @@
 package org.volodymyrzganiaiko.gym.crm.system.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 public class CredentialsService {
     private UserDAO userDAO;
     private CredentialsGenerator credentialsGenerator;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public void setUserDAO (UserDAO userDAO) {
@@ -27,6 +29,11 @@ public class CredentialsService {
         this.credentialsGenerator = credentialsGenerator;
     }
 
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     public String generateUsername(User user) {
         Set<String> existingUsernames = userDAO.findAll().stream().map(User::getUsername).collect(Collectors.toSet());
         return credentialsGenerator.generateUsername(user, existingUsernames);
@@ -36,10 +43,12 @@ public class CredentialsService {
         return credentialsGenerator.generatePassword();
     }
 
-    public void assignCredentials(User user) {
+    public String assignCredentials(User user) {
         user.setIsActive(true);
         user.setUsername(generateUsername(user));
-        user.setPassword(generatePassword());
+        String password = generatePassword();
+        user.setPassword(passwordEncoder.encode(password));
+        return password;
     }
 
 }

@@ -3,6 +3,8 @@ package org.volodymyrzganiaiko.gym.crm.system;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.volodymyrzganiaiko.gym.crm.system.config.AppConfig;
 import org.volodymyrzganiaiko.gym.crm.system.domain.*;
+import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
+import org.volodymyrzganiaiko.gym.crm.system.dto.TrainerRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.facade.GymFacade;
 
 import java.time.LocalDate;
@@ -22,7 +24,7 @@ public class Main {
             Trainee trainee = new Trainee(LocalDate.parse("2003-11-08"), "Test address", user.getFirstName(), user.getLastName(), user.getUsername(), user.getPassword(), user.getIsActive(),  new HashSet<>());
 
             System.out.println(gymFacade.findAllTrainees().size());
-            trainee = gymFacade.createTrainee(trainee);
+            TraineeRegistrationDTO traineeRegistrationDTO = gymFacade.createTrainee(trainee);
             System.out.println(gymFacade.findAllTrainees().size());
             System.out.println(gymFacade.findTraineeById(trainee.getId()));
             trainee.setAddress("Test address 2");
@@ -36,7 +38,7 @@ public class Main {
             user2.setLastName("Zganiaiko");
             Trainer trainer = new Trainer(new TrainingType(1L, "Cross-fit"), user.getFirstName(), user.getLastName(), user.getUsername(), user.getPassword(), user.getIsActive(), new HashSet<>());
             System.out.println(gymFacade.findAllTrainers().size());
-            trainer = gymFacade.createTrainer(trainer);
+            TrainerRegistrationDTO trainerRegistrationDTO = gymFacade.createTrainer(trainer);
             System.out.println(gymFacade.findAllTrainers().size());
             System.out.println(gymFacade.findTrainerById(trainer.getId()));
             trainer.setSpecialization(new TrainingType(2L, "Yoga"));

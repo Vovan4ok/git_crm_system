@@ -6,6 +6,8 @@ import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Training;
 import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
+import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
+import org.volodymyrzganiaiko.gym.crm.system.dto.TrainerRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.service.TraineeService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainerService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainingService;
@@ -30,7 +32,7 @@ public class GymFacade {
         this.trainingTypeService = trainingTypeService;
     }
 
-    public Trainee createTrainee(Trainee trainee) {
+    public TraineeRegistrationDTO createTrainee(Trainee trainee) {
         return traineeService.create(trainee);
     }
 
@@ -70,7 +72,7 @@ public class GymFacade {
         return traineeService.updateTrainerList(username, password, trainerUsernames);
     }
 
-    public Trainer createTrainer(Trainer trainer) {
+    public TrainerRegistrationDTO createTrainer(Trainer trainer) {
         return trainerService.create(trainer);
     }
 

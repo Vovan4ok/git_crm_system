@@ -9,6 +9,7 @@ import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
+import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
 import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.service.AuthenticationService;
 import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
@@ -76,10 +77,10 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Trainee> findByUsername(String username, String password) {
-        authenticationService.check(username, password);
-        log.debug("Finding the trainee with username {}", username);
-        return traineeDAO.findByUsername(username);
+    public Optional<Trainee> findByUsername(Credentials credentials) {
+        authenticationService.check(credentials);
+        log.debug("Finding the trainee with username {}", credentials.username());
+        return traineeDAO.findByUsername(credentials.username());
     }
 
     @Override
@@ -91,72 +92,72 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public void changePassword(String username, String oldPassword, String newPassword) {
-        authenticationService.check(username, oldPassword);
-        Trainee trainee = getByUsernameOrThrow(username);
+    public void changePassword(Credentials credentials, String newPassword) {
+        authenticationService.check(credentials);
+        Trainee trainee = getByUsernameOrThrow(credentials.username());
         requireNotBlank(newPassword, "password");
         trainee.setPassword(passwordEncoder.encode(newPassword));
-        log.info("Trainee with username {} is changing the password", username);
+        log.info("Trainee with username {} is changing the password", credentials.username());
         traineeDAO.update(trainee);
     }
 
     @Override
     @Transactional
-    public Trainee update(String username, String password, Trainee trainee) {
-        authenticationService.check(username, password);
-        Trainee foundTrainee = getByUsernameOrThrow(username);
+    public Trainee update(Credentials credentials, Trainee trainee) {
+        authenticationService.check(credentials);
+        Trainee foundTrainee = getByUsernameOrThrow(credentials.username());
         requireNotBlank(trainee.getFirstName(), "firstName");
         foundTrainee.setFirstName(trainee.getFirstName());
         requireNotBlank(trainee.getLastName(), "lastName");
         foundTrainee.setLastName(trainee.getLastName());
         foundTrainee.setDateOfBirth(trainee.getDateOfBirth());
         foundTrainee.setAddress(trainee.getAddress());
-        log.info("Updating the trainee with username {}", username);
+        log.info("Updating the trainee with username {}", credentials.username());
         return traineeDAO.update(foundTrainee);
     }
 
     @Override
     @Transactional
-    public void activate(String username, String password) {
-        authenticationService.check(username, password);
-        Trainee foundTrainee = getByUsernameOrThrow(username);
+    public void activate(Credentials credentials) {
+        authenticationService.check(credentials);
+        Trainee foundTrainee = getByUsernameOrThrow(credentials.username());
         if (foundTrainee.getIsActive()) {
-            log.warn("Trainee with username {} is already active", username);
-            throw new IllegalStateException("Trainee with the username " + username + " is already active");
+            log.warn("Trainee with username {} is already active", credentials.username());
+            throw new IllegalStateException("Trainee with the username " + credentials.username() + " is already active");
         }
         foundTrainee.setIsActive(true);
-        log.info("Activating the trainee with username {}", username);
+        log.info("Activating the trainee with username {}", credentials.username());
 
         traineeDAO.update(foundTrainee);
     }
 
     @Override
     @Transactional
-    public void deactivate(String username, String password) {
-        authenticationService.check(username, password);
-        Trainee foundTrainee = getByUsernameOrThrow(username);
+    public void deactivate(Credentials credentials) {
+        authenticationService.check(credentials);
+        Trainee foundTrainee = getByUsernameOrThrow(credentials.username());
         if (!foundTrainee.getIsActive()) {
-            log.warn("Trainee with username {} is already deactivated", username);
-            throw new IllegalStateException("Trainee with the username " + username + " is already inactive");
+            log.warn("Trainee with username {} is already deactivated", credentials.username());
+            throw new IllegalStateException("Trainee with the username " + credentials.username() + " is already inactive");
         }
         foundTrainee.setIsActive(false);
-        log.info("Deactivating the trainee with username {}", username);
+        log.info("Deactivating the trainee with username {}", credentials.username());
         traineeDAO.update(foundTrainee);
     }
 
     @Override
     @Transactional
-    public boolean deleteByUsername(String username, String password) {
-        authenticationService.check(username, password);
-        log.info("Deleting the trainee with username {}", username);
-        return traineeDAO.deleteByUsername(username);
+    public boolean deleteByUsername(Credentials credentials) {
+        authenticationService.check(credentials);
+        log.info("Deleting the trainee with username {}", credentials.username());
+        return traineeDAO.deleteByUsername(credentials.username());
     }
 
     @Override
     @Transactional
-    public List<Trainer> updateTrainerList(String username, String password, List<String> trainerUsernames) {
-        authenticationService.check(username, password);
-        Trainee trainee = getByUsernameOrThrow(username);
+    public List<Trainer> updateTrainerList(Credentials credentials, List<String> trainerUsernames) {
+        authenticationService.check(credentials);
+        Trainee trainee = getByUsernameOrThrow(credentials.username());
         Set<Trainer> updatedTrainers = new HashSet<>();
         for (String trainerUsername : trainerUsernames) {
             Optional<Trainer> trainer = trainerDAO.findByUsername(trainerUsername);
@@ -167,7 +168,7 @@ public class TraineeServiceImpl implements TraineeService {
             updatedTrainers.add(trainer.get());
         }
         trainee.setTrainers(updatedTrainers);
-        log.info("Updating trainerList for the trainee with username {}", username);
+        log.info("Updating trainerList for the trainee with username {}", credentials.username());
         traineeDAO.update(trainee);
         return updatedTrainers.stream().toList();
     }

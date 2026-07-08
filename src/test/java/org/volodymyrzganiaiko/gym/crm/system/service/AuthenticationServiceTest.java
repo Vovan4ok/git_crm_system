@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.volodymyrzganiaiko.gym.crm.system.dao.UserDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
+import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
 import org.volodymyrzganiaiko.gym.crm.system.exceptions.AuthenticationException;
 
 import java.time.LocalDate;
@@ -35,7 +36,7 @@ public class AuthenticationServiceTest {
         when(userDAO.findByUsername(any())).thenReturn(Optional.of(trainee));
         when(passwordEncoder.matches("random", trainee.getPassword())).thenReturn(true);
 
-        assertDoesNotThrow(() -> authenticationService.check(trainee.getUsername(), trainee.getPassword()));
+        assertDoesNotThrow(() -> authenticationService.check(new Credentials(trainee.getUsername(), trainee.getPassword())));
     }
 
     @Test
@@ -44,13 +45,13 @@ public class AuthenticationServiceTest {
         when(userDAO.findByUsername(any())).thenReturn(Optional.of(input));
         when(passwordEncoder.matches("password", input.getPassword())).thenReturn(false);
 
-        assertThrows(AuthenticationException.class, () -> authenticationService.check("Test.Test", "password"));
+        assertThrows(AuthenticationException.class, () -> authenticationService.check(new Credentials("Test.Test", "password")));
     }
 
     @Test
     public void check_userNotFound() {
         when(userDAO.findByUsername(any())).thenReturn(Optional.empty());
 
-        assertThrows(AuthenticationException.class, () -> authenticationService.check("John.Doe", "random"));
+        assertThrows(AuthenticationException.class, () -> authenticationService.check(new Credentials("John.Doe", "random")));
     }
 }

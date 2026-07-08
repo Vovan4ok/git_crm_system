@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.volodymyrzganiaiko.gym.crm.system.dao.UserDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.User;
+import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
 import org.volodymyrzganiaiko.gym.crm.system.exceptions.AuthenticationException;
 
 import java.util.Optional;
@@ -30,9 +31,9 @@ public class AuthenticationService {
     }
 
     @Transactional(readOnly = true)
-    public void check(String username, String password) {
-        if(!matches(username, password)) {
-            log.warn("The authentication for user with username {} wasn't successful", username);
+    public void check(Credentials credentials) {
+        if(!matches(credentials.username(), credentials.password())) {
+            log.warn("The authentication for user with username {} wasn't successful", credentials.username());
             throw new AuthenticationException("Wrong username or password");
         }
     }

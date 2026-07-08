@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainingDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.*;
+import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
 import org.volodymyrzganiaiko.gym.crm.system.service.impl.TrainingServiceImpl;
 
 import java.time.LocalDate;
@@ -57,10 +58,10 @@ public class TrainingServiceImplTest {
     public void addTraining_success() {
         when(trainingDAO.save(any(Training.class))).thenReturn(training);
 
-        trainingService.addTraining(training.getTrainee().getUsername(), training.getTrainee().getPassword(), training);
+        trainingService.addTraining(new Credentials(training.getTrainee().getUsername(), training.getTrainee().getPassword()), training);
 
         verify(trainingDAO).save(training);
-        verify(authenticationService).check(training.getTrainee().getUsername(), training.getTrainee().getPassword());
+        verify(authenticationService).check(new Credentials(training.getTrainee().getUsername(), training.getTrainee().getPassword()));
     }
 
     @ParameterizedTest(name = "invalid field: {0}")
@@ -69,7 +70,7 @@ public class TrainingServiceImplTest {
         corrupt.accept(training);
 
         assertThrows(IllegalArgumentException.class,
-                () -> trainingService.addTraining("John.Doe", "random", training));
+                () -> trainingService.addTraining(new Credentials("John.Doe", "random"), training));
         verifyNoInteractions(trainingDAO);
     }
 
@@ -87,10 +88,10 @@ public class TrainingServiceImplTest {
     public void getTraineeTrainings() {
         when(trainingDAO.findTraineeTrainings(any(), any(), any(), any(), any())).thenReturn(List.of(training));
 
-        List<Training> result = trainingService.getTraineeTrainings("John.Doe", "random", null, null, null, null);
+        List<Training> result = trainingService.getTraineeTrainings(new Credentials("John.Doe", "random"), null, null, null, null);
 
         assertFalse(result.isEmpty());
-        verify(authenticationService).check("John.Doe",  "random");
+        verify(authenticationService).check(new Credentials("John.Doe",  "random"));
         verify(trainingDAO).findTraineeTrainings("John.Doe", null, null, null, null);
     }
 
@@ -98,10 +99,10 @@ public class TrainingServiceImplTest {
     public void getTrainerTrainings() {
         when(trainingDAO.findTrainerTrainings(any(), any(), any(), any())).thenReturn(List.of(training));
 
-        List<Training> result = trainingService.getTrainerTrainings("John.Doe", "random", null, null, null);
+        List<Training> result = trainingService.getTrainerTrainings(new Credentials("John.Doe", "random"), null, null, null);
 
         assertFalse(result.isEmpty());
-        verify(authenticationService).check("John.Doe",  "random");
+        verify(authenticationService).check(new Credentials("John.Doe",  "random"));
         verify(trainingDAO).findTrainerTrainings("John.Doe", null, null, null);
     }
 

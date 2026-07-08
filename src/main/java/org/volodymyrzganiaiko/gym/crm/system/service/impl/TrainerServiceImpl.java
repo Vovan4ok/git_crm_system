@@ -9,6 +9,7 @@ import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainingTypeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
+import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
 import org.volodymyrzganiaiko.gym.crm.system.dto.TrainerRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.service.AuthenticationService;
 import org.volodymyrzganiaiko.gym.crm.system.service.CredentialsService;
@@ -74,71 +75,71 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Trainer> findByUsername(String username, String password) {
-        authenticationService.check(username, password);
-        log.debug("Finding the trainer with username {}", username);
-        return trainerDAO.findByUsername(username);
+    public Optional<Trainer> findByUsername(Credentials credentials) {
+        authenticationService.check(credentials);
+        log.debug("Finding the trainer with username {}", credentials.username());
+        return trainerDAO.findByUsername(credentials.username());
     }
 
     @Override
     @Transactional
-    public void changePassword(String username, String oldPassword, String newPassword) {
-        authenticationService.check(username, oldPassword);
-        Trainer trainer = getByUsernameOrThrow(username);
+    public void changePassword(Credentials credentials, String newPassword) {
+        authenticationService.check(credentials);
+        Trainer trainer = getByUsernameOrThrow(credentials.username());
         requireNotBlank(newPassword, "password");
         trainer.setPassword(passwordEncoder.encode(newPassword));
-        log.info("Changing the password for the trainer with username {}", username);
+        log.info("Changing the password for the trainer with username {}", credentials.username());
         trainerDAO.update(trainer);
     }
 
     @Override
     @Transactional
-    public Trainer update(String username, String password, Trainer trainer) {
-        authenticationService.check(username, password);
-        Trainer foundTrainer = getByUsernameOrThrow(username);
+    public Trainer update(Credentials credentials, Trainer trainer) {
+        authenticationService.check(credentials);
+        Trainer foundTrainer = getByUsernameOrThrow(credentials.username());
         requireNotBlank(trainer.getFirstName(), "firstName");
         foundTrainer.setFirstName(trainer.getFirstName());
         requireNotBlank(trainer.getLastName(), "lastName");
         foundTrainer.setLastName(trainer.getLastName());
         foundTrainer.setSpecialization(resolveSpecialization(trainer.getSpecialization()));
-        log.info("Updating the trainer with username {}", username);
+        log.info("Updating the trainer with username {}", credentials.username());
         return trainerDAO.update(foundTrainer);
     }
 
     @Override
     @Transactional
-    public void activate(String username, String password) {
-        authenticationService.check(username, password);
-        Trainer foundTrainer = getByUsernameOrThrow(username);
+    public void activate(Credentials credentials) {
+        authenticationService.check(credentials);
+        Trainer foundTrainer = getByUsernameOrThrow(credentials.username());
         if (foundTrainer.getIsActive()) {
-            log.warn("Trainer with the username {} is already active", username);
-            throw new IllegalStateException("Trainer with the username " + username + " is already active");
+            log.warn("Trainer with the username {} is already active", credentials.username());
+            throw new IllegalStateException("Trainer with the username " + credentials.username() + " is already active");
         }
         foundTrainer.setIsActive(true);
-        log.info("Activating the trainer with username {}", username);
+        log.info("Activating the trainer with username {}", credentials.username());
         trainerDAO.update(foundTrainer);
     }
 
     @Override
     @Transactional
-    public void deactivate(String username, String password) {
-        authenticationService.check(username, password);
-        Trainer foundTrainer = getByUsernameOrThrow(username);
+    public void deactivate(Credentials credentials) {
+        authenticationService.check(credentials);
+        Trainer foundTrainer = getByUsernameOrThrow(credentials.username());
         if (!foundTrainer.getIsActive()) {
-            log.warn("Trainer with the username {} is already deactivated", username);
-            throw new IllegalStateException("Trainer with the username " + username + " is already inactive");
+            log.warn("Trainer with the username {} is already deactivated", credentials.username());
+            throw new IllegalStateException("Trainer with the username " + credentials.username() + " is already inactive");
         }
         foundTrainer.setIsActive(false);
-        log.info("Deactivating the trainer with username {}", username);
+        log.info("Deactivating the trainer with username {}", credentials.username());
         trainerDAO.update(foundTrainer);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Trainer> getUnassignedTrainers(String traineeUsername, String password) {
-        authenticationService.check(traineeUsername, password);
-        log.debug("Finding unassigned trainers for the trainee with username {}", traineeUsername);
-        return trainerDAO.findUnassignedTrainers(traineeUsername);
+    public List<Trainer> getUnassignedTrainers(Credentials credentials) {
+        authenticationService.check(credentials);
+        log.debug("Finding unassigned trainers for the trainee with username {}", credentials.username());
+        return trainerDAO.findUnassignedTrainers(credentials.username());
     }
 
     @Override

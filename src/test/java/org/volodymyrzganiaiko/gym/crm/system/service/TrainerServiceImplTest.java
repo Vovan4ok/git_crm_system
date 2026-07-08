@@ -12,6 +12,7 @@ import org.volodymyrzganiaiko.gym.crm.system.dao.TrainingTypeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
 import org.volodymyrzganiaiko.gym.crm.system.domain.User;
+import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
 import org.volodymyrzganiaiko.gym.crm.system.dto.TrainerRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.exceptions.AuthenticationException;
 import org.volodymyrzganiaiko.gym.crm.system.service.impl.TrainerServiceImpl;
@@ -91,17 +92,17 @@ public class TrainerServiceImplTest {
     public void findByUsername_positiveCase() {
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.ofNullable(trainer));
 
-        Optional<Trainer> result = trainerService.findByUsername(trainer.getUsername(), trainer.getPassword());
+        Optional<Trainer> result = trainerService.findByUsername(new Credentials(trainer.getUsername(), trainer.getPassword()));
 
         assertTrue(result.isPresent());
-        verify(authenticationService).check(trainer.getUsername(), trainer.getPassword());
+        verify(authenticationService).check(new Credentials(trainer.getUsername(), trainer.getPassword()));
     }
 
     @Test
     public void findByUsername_negativeCase_throwsException() {
-        doThrow(new AuthenticationException("Some message")).when(authenticationService).check(any(String.class), any(String.class));
+        doThrow(new AuthenticationException("Some message")).when(authenticationService).check(any(Credentials.class));
 
-        assertThrows(AuthenticationException.class, () -> trainerService.findByUsername(trainer.getUsername(), trainer.getPassword()));
+        assertThrows(AuthenticationException.class, () -> trainerService.findByUsername(new Credentials(trainer.getUsername(), trainer.getPassword())));
         verifyNoInteractions(trainerDAO);
     }
 
@@ -110,10 +111,10 @@ public class TrainerServiceImplTest {
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
         when(passwordEncoder.encode("random1")).thenReturn("random1");
 
-        trainerService.changePassword("John.Doe", "random", "random1");
+        trainerService.changePassword(new Credentials("John.Doe", "random"), "random1");
 
         assertEquals("random1", trainer.getPassword());
-        verify(authenticationService).check("John.Doe", "random");
+        verify(authenticationService).check(new Credentials("John.Doe", "random"));
         verify(trainerDAO).update(trainer);
     }
 
@@ -121,7 +122,7 @@ public class TrainerServiceImplTest {
     public void changePassword_throwsException() {
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
 
-        assertThrows(IllegalArgumentException.class, () -> trainerService.changePassword("John.Doe", "randomPass", " "));
+        assertThrows(IllegalArgumentException.class, () -> trainerService.changePassword(new Credentials("John.Doe", "randomPass"), " "));
         verify(trainerDAO, never()).update(any());
     }
 
@@ -129,7 +130,7 @@ public class TrainerServiceImplTest {
     public void changePassword_trainerNotFound_throwsException() {
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> trainerService.changePassword("John.Doe", "random", "randomPassword"));
+        assertThrows(IllegalArgumentException.class, () -> trainerService.changePassword(new Credentials("John.Doe", "random"), "randomPassword"));
         verify(trainerDAO, never()).update(any());
     }
 
@@ -142,13 +143,13 @@ public class TrainerServiceImplTest {
         trainer.setFirstName("Test");
         trainer.setLastName("Test");
 
-        Trainer result = trainerService.update(trainer.getUsername(), trainer.getPassword(), trainer);
+        Trainer result = trainerService.update(new Credentials(trainer.getUsername(), trainer.getPassword()), trainer);
 
         assertTrue(result.getIsActive());
         assertEquals("Test", result.getFirstName());
         assertEquals("Test", result.getLastName());
         verify(trainerDAO).update(trainer);
-        verify(authenticationService).check(trainer.getUsername(), trainer.getPassword());
+        verify(authenticationService).check(new Credentials(trainer.getUsername(), trainer.getPassword()));
     }
 
     @Test
@@ -157,7 +158,7 @@ public class TrainerServiceImplTest {
         when(trainingTypeDAO.findById(99L)).thenReturn(Optional.empty());
 
         trainer.setSpecialization(new TrainingType(99L, "Cross-fit"));
-        assertThrows(IllegalArgumentException.class, () -> trainerService.update(trainer.getUsername(), trainer.getPassword(), trainer));
+        assertThrows(IllegalArgumentException.class, () -> trainerService.update(new Credentials(trainer.getUsername(), trainer.getPassword()), trainer));
         verify(trainerDAO, never()).update(trainer);
     }
 
@@ -167,7 +168,7 @@ public class TrainerServiceImplTest {
 
         trainer.setFirstName("");
 
-        assertThrows(IllegalArgumentException.class, () -> trainerService.update(trainer.getUsername(), trainer.getPassword(), trainer));
+        assertThrows(IllegalArgumentException.class, () -> trainerService.update(new Credentials(trainer.getUsername(), trainer.getPassword()), trainer));
         verify(trainerDAO, never()).update(any());
     }
 
@@ -177,7 +178,7 @@ public class TrainerServiceImplTest {
 
         trainer.setFirstName("Test");
 
-        assertThrows(IllegalArgumentException.class, () -> trainerService.update(trainer.getUsername(), trainer.getPassword(), trainer));
+        assertThrows(IllegalArgumentException.class, () -> trainerService.update(new Credentials(trainer.getUsername(), trainer.getPassword()), trainer));
         verify(trainerDAO, never()).update(any());
     }
 
@@ -186,7 +187,7 @@ public class TrainerServiceImplTest {
         trainer.setIsActive(false);
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
 
-        trainerService.activate(trainer.getUsername(), trainer.getPassword());
+        trainerService.activate(new Credentials(trainer.getUsername(), trainer.getPassword()));
 
         assertTrue(trainer.getIsActive());
         verify(trainerDAO).update(trainer);
@@ -196,7 +197,7 @@ public class TrainerServiceImplTest {
     public void activateTrainer_throwsException() {
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
 
-        assertThrows(IllegalStateException.class, () -> trainerService.activate(trainer.getUsername(), trainer.getPassword()));
+        assertThrows(IllegalStateException.class, () -> trainerService.activate(new Credentials(trainer.getUsername(), trainer.getPassword())));
         verify(trainerDAO, never()).update(any());
     }
 
@@ -204,7 +205,7 @@ public class TrainerServiceImplTest {
     public void deactivateTrainer_success() {
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
 
-        trainerService.deactivate(trainer.getUsername(), trainer.getPassword());
+        trainerService.deactivate(new Credentials(trainer.getUsername(), trainer.getPassword()));
 
         assertFalse(trainer.getIsActive());
         verify(trainerDAO).update(trainer);
@@ -215,7 +216,7 @@ public class TrainerServiceImplTest {
         trainer.setIsActive(false);
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
 
-        assertThrows(IllegalStateException.class, () -> trainerService.deactivate(trainer.getUsername(), trainer.getPassword()));
+        assertThrows(IllegalStateException.class, () -> trainerService.deactivate(new Credentials(trainer.getUsername(), trainer.getPassword())));
         verify(trainerDAO, never()).update(any());
     }
 
@@ -254,10 +255,10 @@ public class TrainerServiceImplTest {
     public void getUnassignedTrainers() {
         when(trainerDAO.findUnassignedTrainers(any(String.class))).thenReturn(new ArrayList<>());
 
-        List<Trainer> result = trainerService.getUnassignedTrainers("John.Doe", "randomPass");
+        List<Trainer> result = trainerService.getUnassignedTrainers(new Credentials("John.Doe", "randomPass"));
 
         assertTrue(result.isEmpty());
-        verify(authenticationService).check("John.Doe", "randomPass");
+        verify(authenticationService).check(new Credentials("John.Doe", "randomPass"));
         verify(trainerDAO).findUnassignedTrainers("John.Doe");
     }
 }

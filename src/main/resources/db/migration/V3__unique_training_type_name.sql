@@ -1,0 +1,1 @@
+alter table training_types add constraint uk_training_type_name unique (training_type_name);

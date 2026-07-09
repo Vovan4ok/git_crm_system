@@ -16,7 +16,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)

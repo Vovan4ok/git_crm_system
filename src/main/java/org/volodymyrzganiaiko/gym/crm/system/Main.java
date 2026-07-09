@@ -19,10 +19,7 @@ public class Main {
 
 
             /////Trainees
-            User user =  new User();
-            user.setFirstName("John");
-            user.setLastName("Doe");
-            Trainee trainee = new Trainee(LocalDate.parse("2003-11-08"), "Test address", user.getFirstName(), user.getLastName(), user.getUsername(), user.getPassword(), user.getIsActive(),  new HashSet<>());
+            Trainee trainee = new Trainee(LocalDate.parse("2003-11-08"), "Test address", "John", "Doe", null, null, null,  new HashSet<>());
 
             System.out.println(gymFacade.findAllTrainees().size());
             TraineeRegistrationDTO traineeRegistrationDTO = gymFacade.createTrainee(trainee);
@@ -34,10 +31,7 @@ public class Main {
 
 
             ////Trainers
-            User user2 = new  User();
-            user2.setFirstName("Volodymyr");
-            user2.setLastName("Zganiaiko");
-            Trainer trainer = new Trainer(new TrainingType(1L, "Cross-fit"), user.getFirstName(), user.getLastName(), user.getUsername(), user.getPassword(), user.getIsActive(), new HashSet<>());
+            Trainer trainer = new Trainer(new TrainingType(1L, "Cross-fit"), "Volodymyr", "Zganiaiko", null, null, null, new HashSet<>());
             System.out.println(gymFacade.findAllTrainers().size());
             TrainerRegistrationDTO trainerRegistrationDTO = gymFacade.createTrainer(trainer);
             System.out.println(gymFacade.findAllTrainers().size());

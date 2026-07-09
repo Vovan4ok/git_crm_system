@@ -1,6 +1,7 @@
 package org.volodymyrzganiaiko.gym.crm.system.utils;
 
 import org.junit.jupiter.api.Test;
+import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.User;
 
 import java.util.Set;
@@ -31,9 +32,9 @@ public class CredentialsGeneratorTest {
     }
 
     private User user(String firstName, String lastName) {
-        User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        return user;
+        User testTrainee = new Trainee();
+        testTrainee.setFirstName(firstName);
+        testTrainee.setLastName(lastName);
+        return testTrainee;
     }
 }

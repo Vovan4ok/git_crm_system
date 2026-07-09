@@ -9,10 +9,7 @@ import org.volodymyrzganiaiko.gym.crm.system.domain.*;
 import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
 import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.dto.TrainerRegistrationDTO;
-import org.volodymyrzganiaiko.gym.crm.system.service.TraineeService;
-import org.volodymyrzganiaiko.gym.crm.system.service.TrainerService;
-import org.volodymyrzganiaiko.gym.crm.system.service.TrainingService;
-import org.volodymyrzganiaiko.gym.crm.system.service.TrainingTypeService;
+import org.volodymyrzganiaiko.gym.crm.system.service.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,21 +35,29 @@ class GymFacadeTest {
 
     @Mock
     private TrainingTypeService trainingTypeService;
+    
+    @Mock
+    private AuthenticationService authenticationService;
+    
+    @Mock
+    private CredentialsService credentialsService;
 
     @InjectMocks
     GymFacade gymFacade;
 
     @Test
     void createTrainee() {
-        Trainee returnTrainee = new Trainee(null, null, null, null, null, null, null, null);
-        returnTrainee.setId(1L);
-        TraineeRegistrationDTO shouldReturnDTO = new TraineeRegistrationDTO(returnTrainee, "test");
-        when(traineeService.create(any())).thenReturn(shouldReturnDTO);
+        Trainee saved = new Trainee();
+        saved.setUsername("John.Doe");
+        when(credentialsService.assignCredentials(any())).thenReturn("test");
+        when(traineeService.create(any())).thenReturn(saved);
         Trainee input = new Trainee();
 
         TraineeRegistrationDTO result = gymFacade.createTrainee(input);
 
-        assertEquals(1L, result.trainee().getId());
+        assertEquals("John.Doe", result.username());
+        assertEquals("test", result.password());
+        verify(credentialsService).assignCredentials(input);
         verify(traineeService).create(input);
     }
 
@@ -68,50 +73,50 @@ class GymFacadeTest {
 
     @Test
     void findTraineeByUsername() {
-        when(traineeService.findByUsername(new Credentials("John.Doe", "pass"))).thenReturn(Optional.of(new Trainee()));
+        when(traineeService.findByUsername("John.Doe")).thenReturn(Optional.of(new Trainee()));
 
         Optional<Trainee> result = gymFacade.findTraineeByUsername(new Credentials("John.Doe", "pass"));
 
         assertTrue(result.isPresent());
-        verify(traineeService).findByUsername(new Credentials("John.Doe", "pass"));
+        verify(traineeService).findByUsername("John.Doe");
     }
 
     @Test
     void changeTraineePassword() {
         gymFacade.changeTraineePassword(new Credentials("John.Doe", "oldPass"), "newPass");
-        verify(traineeService).changePassword(new Credentials("John.Doe", "oldPass"), "newPass");
+        verify(traineeService).changePassword("John.Doe", "newPass");
     }
 
     @Test
     void updateTrainee() {
-        when(traineeService.update(any(Credentials.class), any())).thenReturn(new Trainee());
+        when(traineeService.update(any(), any(), any(), any(), any())).thenReturn(new Trainee());
 
         Trainee result = gymFacade.updateTrainee(new Credentials("John.Doe", "pass"), new Trainee());
 
         assertNotNull(result);
-        verify(traineeService).update(any(Credentials.class), any());
+        verify(traineeService).update("John.Doe", null, null, null, null);
     }
 
     @Test
     void activateTrainee() {
         gymFacade.activateTrainee(new Credentials("John.Doe", "pass"));
-        verify(traineeService).activate(new Credentials("John.Doe", "pass"));
+        verify(traineeService).activate("John.Doe");
     }
 
     @Test
     void deactivateTrainee() {
         gymFacade.deactivateTrainee(new Credentials("John.Doe", "pass"));
-        verify(traineeService).deactivate(new Credentials("John.Doe", "pass"));
+        verify(traineeService).deactivate("John.Doe");
     }
 
     @Test
     void deleteTraineeByUsername() {
-        when(traineeService.deleteByUsername(new Credentials("John.Doe", "pass"))).thenReturn(true);
+        when(traineeService.deleteByUsername("John.Doe")).thenReturn(true);
 
         boolean result = gymFacade.deleteTraineeByUsername(new Credentials("John.Doe", "pass"));
 
         assertTrue(result);
-        verify(traineeService).deleteByUsername(new Credentials("John.Doe", "pass"));
+        verify(traineeService).deleteByUsername("John.Doe");
     }
 
     @Test
@@ -126,22 +131,27 @@ class GymFacadeTest {
 
     @Test
     void updateTrainerListForTrainee() {
-        when(traineeService.updateTrainerList(any(Credentials.class), any())).thenReturn(new ArrayList<>());
+        when(traineeService.updateTrainerList(any(), any())).thenReturn(new ArrayList<>());
 
         List<Trainer> result = gymFacade.updateTrainerListForTrainee(new Credentials("John.Doe", "pass"), new ArrayList<>());
 
         assertNotNull(result);
-        verify(traineeService).updateTrainerList(any(Credentials.class), any());
+        verify(traineeService).updateTrainerList(any(), any());
     }
 
     @Test
     void createTrainer() {
-        when(trainerService.create(any())).thenReturn(new TrainerRegistrationDTO(new Trainer(), "test"));
+        Trainer saved = new Trainer();
+        saved.setUsername("John.Doe");
+        when(credentialsService.assignCredentials(any())).thenReturn("test");
+        when(trainerService.create(any())).thenReturn(saved);
         Trainer input = new Trainer();
 
         TrainerRegistrationDTO result = gymFacade.createTrainer(input);
 
-        assertNotNull(result);
+        assertEquals("John.Doe", result.username());
+        assertEquals("test", result.password());
+        verify(credentialsService).assignCredentials(input);
         verify(trainerService).create(input);
     }
 
@@ -157,50 +167,50 @@ class GymFacadeTest {
 
     @Test
     void findTrainerByUsername() {
-        when(trainerService.findByUsername(new Credentials("John.Doe", "pass"))).thenReturn(Optional.of(new Trainer()));
+        when(trainerService.findByUsername("John.Doe")).thenReturn(Optional.of(new Trainer()));
 
         Optional<Trainer> result = gymFacade.findTrainerByUsername(new Credentials("John.Doe", "pass"));
 
         assertTrue(result.isPresent());
-        verify(trainerService).findByUsername(new Credentials("John.Doe", "pass"));
+        verify(trainerService).findByUsername("John.Doe");
     }
 
     @Test
     void changeTrainerPassword() {
         gymFacade.changeTrainerPassword(new Credentials("John.Doe", "oldPass"), "newPass");
-        verify(trainerService).changePassword(new Credentials("John.Doe", "oldPass"), "newPass");
+        verify(trainerService).changePassword("John.Doe", "newPass");
     }
 
     @Test
     void updateTrainer() {
-        when(trainerService.update(any(Credentials.class), any())).thenReturn(new Trainer());
+        when(trainerService.update(any(), any(), any(), any())).thenReturn(new Trainer());
 
         Trainer result = gymFacade.updateTrainer(new Credentials("John.Doe", "pass"), new Trainer());
 
         assertNotNull(result);
-        verify(trainerService).update(any(Credentials.class), any());
+        verify(trainerService).update("John.Doe", null, null, null);
     }
 
     @Test
     void activateTrainer() {
         gymFacade.activateTrainer(new Credentials("John.Doe", "pass"));
-        verify(trainerService).activate(new Credentials("John.Doe", "pass"));
+        verify(trainerService).activate("John.Doe");
     }
 
     @Test
     void deactivateTrainer() {
         gymFacade.deactivateTrainer(new Credentials("John.Doe", "pass"));
-        verify(trainerService).deactivate(new Credentials("John.Doe", "pass"));
+        verify(trainerService).deactivate("John.Doe");
     }
 
     @Test
     void getUnassignedTrainers() {
-        when(trainerService.getUnassignedTrainers(new Credentials("John.Doe", "pass"))).thenReturn(new ArrayList<>());
+        when(trainerService.getUnassignedTrainers("John.Doe")).thenReturn(new ArrayList<>());
 
         List<Trainer> result = gymFacade.getUnassignedTrainers(new Credentials("John.Doe", "pass"));
 
         assertNotNull(result);
-        verify(trainerService).getUnassignedTrainers(new Credentials("John.Doe", "pass"));
+        verify(trainerService).getUnassignedTrainers("John.Doe");
     }
 
     @Test
@@ -215,13 +225,13 @@ class GymFacadeTest {
 
     @Test
     void createTraining() {
-        when(trainingService.addTraining(any(Credentials.class), any())).thenReturn(new Training());
+        when(trainingService.addTraining(any())).thenReturn(new Training());
         Training input = new Training();
 
         Training result = gymFacade.createTraining(new Credentials("John.Doe", "pass"), input);
 
         assertNotNull(result);
-        verify(trainingService).addTraining(any(Credentials.class), eq(input));
+        verify(trainingService).addTraining(eq(input));
     }
 
     @Test
@@ -236,22 +246,22 @@ class GymFacadeTest {
 
     @Test
     void getTraineeTrainings() {
-        when(trainingService.getTraineeTrainings(new Credentials("John.Doe", "pass"), null, null, null, null)).thenReturn(new ArrayList<>());
+        when(trainingService.getTraineeTrainings("John.Doe", null, null, null, null)).thenReturn(new ArrayList<>());
 
         List<Training> result = gymFacade.getTraineeTrainings(new Credentials("John.Doe", "pass"), null, null, null, null);
 
         assertNotNull(result);
-        verify(trainingService).getTraineeTrainings(new Credentials("John.Doe", "pass"), null, null, null, null);
+        verify(trainingService).getTraineeTrainings("John.Doe", null, null, null, null);
     }
 
     @Test
     void getTrainerTrainings() {
-        when(trainingService.getTrainerTrainings(new Credentials("John.Doe", "pass"), null, null, null)).thenReturn(new ArrayList<>());
+        when(trainingService.getTrainerTrainings("John.Doe", null, null, null)).thenReturn(new ArrayList<>());
 
         List<Training> result = gymFacade.getTrainerTrainings(new Credentials("John.Doe", "pass"), null, null, null);
 
         assertNotNull(result);
-        verify(trainingService).getTrainerTrainings(new Credentials("John.Doe", "pass"), null, null, null);
+        verify(trainingService).getTrainerTrainings("John.Doe", null, null, null);
     }
 
     @Test

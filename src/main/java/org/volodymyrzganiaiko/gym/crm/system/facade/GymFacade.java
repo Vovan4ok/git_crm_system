@@ -2,6 +2,7 @@ package org.volodymyrzganiaiko.gym.crm.system.facade;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Training;
@@ -9,10 +10,7 @@ import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
 import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
 import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.dto.TrainerRegistrationDTO;
-import org.volodymyrzganiaiko.gym.crm.system.service.TraineeService;
-import org.volodymyrzganiaiko.gym.crm.system.service.TrainerService;
-import org.volodymyrzganiaiko.gym.crm.system.service.TrainingService;
-import org.volodymyrzganiaiko.gym.crm.system.service.TrainingTypeService;
+import org.volodymyrzganiaiko.gym.crm.system.service.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,17 +22,24 @@ public class GymFacade {
     private final TrainerService trainerService;
     private final TrainingService trainingService;
     private final TrainingTypeService trainingTypeService;
+    private final AuthenticationService authenticationService;
+    private final CredentialsService credentialsService;
 
     @Autowired
-    public GymFacade(TraineeService traineeService, TrainerService trainerService, TrainingService trainingService, TrainingTypeService trainingTypeService) {
+    public GymFacade(TraineeService traineeService, TrainerService trainerService, TrainingService trainingService, TrainingTypeService trainingTypeService, AuthenticationService authenticationService, CredentialsService credentialsService) {
         this.traineeService = traineeService;
         this.trainerService = trainerService;
         this.trainingService = trainingService;
         this.trainingTypeService = trainingTypeService;
+        this.authenticationService = authenticationService;
+        this.credentialsService = credentialsService;
     }
 
+    @Transactional
     public TraineeRegistrationDTO createTrainee(Trainee trainee) {
-        return traineeService.create(trainee);
+        String rawPassword = credentialsService.assignCredentials(trainee);
+        Trainee saved = traineeService.create(trainee);
+        return new TraineeRegistrationDTO(saved.getUsername(), rawPassword);
     }
 
     public Optional<Trainee> findTraineeById(Long id) {
@@ -42,27 +47,33 @@ public class GymFacade {
     }
 
     public Optional<Trainee> findTraineeByUsername(Credentials credentials) {
-        return traineeService.findByUsername(credentials);
+        authenticationService.check(credentials);
+        return traineeService.findByUsername(credentials.username());
     }
 
     public void changeTraineePassword(Credentials credentials, String newPassword) {
-        traineeService.changePassword(credentials, newPassword);
+        authenticationService.check(credentials);
+        traineeService.changePassword(credentials.username(), newPassword);
     }
 
     public Trainee updateTrainee(Credentials credentials, Trainee trainee) {
-        return traineeService.update(credentials, trainee);
+        authenticationService.check(credentials);
+        return traineeService.update(credentials.username(), trainee.getFirstName(), trainee.getLastName(), trainee.getDateOfBirth(), trainee.getAddress());
     }
 
     public void activateTrainee(Credentials credentials) {
-        traineeService.activate(credentials);
+        authenticationService.check(credentials);
+        traineeService.activate(credentials.username());
     }
 
     public void deactivateTrainee(Credentials credentials) {
-        traineeService.deactivate(credentials);
+        authenticationService.check(credentials);
+        traineeService.deactivate(credentials.username());
     }
 
     public boolean deleteTraineeByUsername(Credentials credentials) {
-        return traineeService.deleteByUsername(credentials);
+        authenticationService.check(credentials);
+        return traineeService.deleteByUsername(credentials.username());
     }
 
     public List<Trainee> findAllTrainees() {
@@ -70,11 +81,15 @@ public class GymFacade {
     }
 
     public List<Trainer> updateTrainerListForTrainee(Credentials credentials, List<String> trainerUsernames) {
-        return traineeService.updateTrainerList(credentials, trainerUsernames);
+        authenticationService.check(credentials);
+        return traineeService.updateTrainerList(credentials.username(), trainerUsernames);
     }
 
+    @Transactional
     public TrainerRegistrationDTO createTrainer(Trainer trainer) {
-        return trainerService.create(trainer);
+        String rawPassword = credentialsService.assignCredentials(trainer);
+        Trainer saved = trainerService.create(trainer);
+        return new TrainerRegistrationDTO(saved.getUsername(), rawPassword);
     }
 
     public Optional<Trainer> findTrainerById(Long id) {
@@ -82,27 +97,33 @@ public class GymFacade {
     }
 
     public Optional<Trainer> findTrainerByUsername(Credentials credentials) {
-        return trainerService.findByUsername(credentials);
+        authenticationService.check(credentials);
+        return trainerService.findByUsername(credentials.username());
     }
 
     public void changeTrainerPassword(Credentials credentials, String newPassword) {
-        trainerService.changePassword(credentials, newPassword);
+        authenticationService.check(credentials);
+        trainerService.changePassword(credentials.username(), newPassword);
     }
 
     public Trainer updateTrainer(Credentials credentials, Trainer trainer) {
-        return trainerService.update(credentials, trainer);
+        authenticationService.check(credentials);
+        return trainerService.update(credentials.username(), trainer.getFirstName(), trainer.getLastName(), trainer.getSpecialization());
     }
 
     public void activateTrainer(Credentials credentials) {
-        trainerService.activate(credentials);
+        authenticationService.check(credentials);
+        trainerService.activate(credentials.username());
     }
 
     public void deactivateTrainer(Credentials credentials) {
-        trainerService.deactivate(credentials);
+        authenticationService.check(credentials);
+        trainerService.deactivate(credentials.username());
     }
 
     public List<Trainer> getUnassignedTrainers(Credentials credentials) {
-        return trainerService.getUnassignedTrainers(credentials);
+        authenticationService.check(credentials);
+        return trainerService.getUnassignedTrainers(credentials.username());
     }
 
     public List<Trainer> findAllTrainers() {
@@ -110,7 +131,8 @@ public class GymFacade {
     }
 
     public Training createTraining(Credentials credentials, Training training) {
-        return trainingService.addTraining(credentials, training);
+        authenticationService.check(credentials);
+        return trainingService.addTraining(training);
     }
 
     public Optional<Training> findTrainingById(Long id) {
@@ -118,11 +140,13 @@ public class GymFacade {
     }
 
     public List<Training> getTraineeTrainings(Credentials credentials, LocalDate from, LocalDate to, String trainerUsername, String trainingTypeName) {
-        return trainingService.getTraineeTrainings(credentials, from, to, trainerUsername, trainingTypeName);
+        authenticationService.check(credentials);
+        return trainingService.getTraineeTrainings(credentials.username(), from, to, trainerUsername, trainingTypeName);
     }
 
     public List<Training> getTrainerTrainings(Credentials credentials, LocalDate from, LocalDate to, String traineeUsername) {
-        return trainingService.getTrainerTrainings(credentials, from, to, traineeUsername);
+        authenticationService.check(credentials);
+        return trainingService.getTrainerTrainings(credentials.username(), from, to, traineeUsername);
     }
 
     public List<Training> findAllTrainings() {

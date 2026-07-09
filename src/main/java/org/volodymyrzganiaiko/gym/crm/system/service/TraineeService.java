@@ -2,21 +2,20 @@ package org.volodymyrzganiaiko.gym.crm.system.service;
 
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
-import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
-import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 public interface TraineeService {
-    TraineeRegistrationDTO create(Trainee trainee);
+    Trainee create(Trainee trainee);
     Optional<Trainee> findById(Long id);
-    Optional<Trainee> findByUsername(Credentials credentials);
+    Optional<Trainee> findByUsername(String username);
     List<Trainee> findAll();
-    void changePassword(Credentials credentials, String newPassword);
-    Trainee update(Credentials credentials, Trainee trainee);
-    void activate(Credentials credentials);
-    void deactivate(Credentials credentials);
-    boolean deleteByUsername(Credentials credentials);
-    List<Trainer> updateTrainerList(Credentials credentials, List<String> trainerUsernames);
+    void changePassword(String username, String newPassword);
+    Trainee update(String username, String newFirstName, String newLastName, LocalDate newDateOfBirth, String newAddress);
+    void activate(String username);
+    void deactivate(String username);
+    boolean deleteByUsername(String username);
+    List<Trainer> updateTrainerList(String username, List<String> trainerUsernames);
 }

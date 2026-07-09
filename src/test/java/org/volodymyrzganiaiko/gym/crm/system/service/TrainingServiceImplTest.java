@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainingDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.*;
-import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
 import org.volodymyrzganiaiko.gym.crm.system.service.impl.TrainingServiceImpl;
 
 import javax.validation.ConstraintViolationException;
@@ -32,9 +31,6 @@ import static org.mockito.Mockito.*;
 public class TrainingServiceImplTest {
     @Mock
     private TrainingDAO trainingDAO;
-
-    @Mock
-    private AuthenticationService authenticationService;
 
     @InjectMocks
     private TrainingServiceImpl trainingService;
@@ -63,10 +59,9 @@ public class TrainingServiceImplTest {
     public void addTraining_success() {
         when(trainingDAO.save(any(Training.class))).thenReturn(training);
 
-        trainingService.addTraining(new Credentials(training.getTrainee().getUsername(), training.getTrainee().getPassword()), training);
+        trainingService.addTraining(training);
 
         verify(trainingDAO).save(training);
-        verify(authenticationService).check(new Credentials(training.getTrainee().getUsername(), training.getTrainee().getPassword()));
     }
 
     @ParameterizedTest(name = "invalid field: {0}")
@@ -75,7 +70,7 @@ public class TrainingServiceImplTest {
         corrupt.accept(training);
 
         assertThrows(ConstraintViolationException.class,
-                () -> trainingService.addTraining(new Credentials("John.Doe", "random"), training));
+                () -> trainingService.addTraining(training));
         verifyNoInteractions(trainingDAO);
     }
 
@@ -93,10 +88,9 @@ public class TrainingServiceImplTest {
     public void getTraineeTrainings() {
         when(trainingDAO.findTraineeTrainings(any(), any(), any(), any(), any())).thenReturn(List.of(training));
 
-        List<Training> result = trainingService.getTraineeTrainings(new Credentials("John.Doe", "random"), null, null, null, null);
+        List<Training> result = trainingService.getTraineeTrainings("John.Doe", null, null, null, null);
 
         assertFalse(result.isEmpty());
-        verify(authenticationService).check(new Credentials("John.Doe",  "random"));
         verify(trainingDAO).findTraineeTrainings("John.Doe", null, null, null, null);
     }
 
@@ -104,10 +98,9 @@ public class TrainingServiceImplTest {
     public void getTrainerTrainings() {
         when(trainingDAO.findTrainerTrainings(any(), any(), any(), any())).thenReturn(List.of(training));
 
-        List<Training> result = trainingService.getTrainerTrainings(new Credentials("John.Doe", "random"), null, null, null);
+        List<Training> result = trainingService.getTrainerTrainings("John.Doe", null, null, null);
 
         assertFalse(result.isEmpty());
-        verify(authenticationService).check(new Credentials("John.Doe",  "random"));
         verify(trainingDAO).findTrainerTrainings("John.Doe", null, null, null);
     }
 

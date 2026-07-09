@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainingDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Training;
-import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
-import org.volodymyrzganiaiko.gym.crm.system.service.AuthenticationService;
 import org.volodymyrzganiaiko.gym.crm.system.service.TrainingService;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +21,6 @@ import java.util.Set;
 @Service
 public class TrainingServiceImpl implements TrainingService {
     private TrainingDAO trainingDAO;
-    private AuthenticationService authenticationService;
     private Validator validator;
 
     private static final Logger log = LoggerFactory.getLogger(TrainingServiceImpl.class);
@@ -34,19 +31,13 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Autowired
-    public void setAuthenticationService(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
-
-    @Autowired
     public void setValidator(Validator validator) {
         this.validator = validator;
     }
 
     @Override
     @Transactional
-    public Training addTraining(Credentials credentials, Training training) {
-        authenticationService.check(credentials);
+    public Training addTraining(Training training) {
         Set<ConstraintViolation<Training>> violations = validator.validate(training);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
@@ -65,18 +56,16 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Training> getTraineeTrainings(Credentials credentials, LocalDate from, LocalDate to, String trainerUsername, String trainingTypeName) {
-        authenticationService.check(credentials);
-        log.debug("Finding the training records for trainee with username {}", credentials.username());
-        return trainingDAO.findTraineeTrainings(credentials.username(), from, to, trainerUsername, trainingTypeName);
+    public List<Training> getTraineeTrainings(String traineeUsername, LocalDate from, LocalDate to, String trainerUsername, String trainingTypeName) {
+        log.debug("Finding the training records for trainee with username {}", traineeUsername);
+        return trainingDAO.findTraineeTrainings(traineeUsername, from, to, trainerUsername, trainingTypeName);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Training> getTrainerTrainings(Credentials credentials, LocalDate from, LocalDate to, String traineeUsername) {
-        authenticationService.check(credentials);
-        log.debug("Finding the training records for trainer with username {}", credentials.username());
-        return trainingDAO.findTrainerTrainings(credentials.username(), from, to, traineeUsername);
+    public List<Training> getTrainerTrainings(String trainerUsername, LocalDate from, LocalDate to, String traineeUsername) {
+        log.debug("Finding the training records for trainer with username {}", trainerUsername);
+        return trainingDAO.findTrainerTrainings(trainerUsername, from, to, traineeUsername);
     }
 
     @Override

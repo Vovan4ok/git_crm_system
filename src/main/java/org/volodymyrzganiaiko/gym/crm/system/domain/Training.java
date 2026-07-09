@@ -1,11 +1,13 @@
 package org.volodymyrzganiaiko.gym.crm.system.domain;
 
 import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name="trainings")
@@ -64,5 +66,18 @@ public class Training {
                 ", trainingDate=" + trainingDate +
                 ", trainingDurationInMinutes=" + trainingDurationInMinutes +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Training training = (Training) o;
+        return id != null && Objects.equals(id, training.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
     }
 }

@@ -36,10 +36,11 @@ public class CredentialsServiceTest {
 
     @Test
     void generateUsername_collectsUsernames_andDelegates() {
-        when(userDAO.findAll()).thenReturn(List.of(new Trainee(null, null, null, null, "A.One", null, true, null), new Trainee(null, null, null, null, "B.Two", null, true, null)));
+        Trainee input = new Trainee(null, null, null, null, "A.One", null, true, null);
+        when(userDAO.findAll()).thenReturn(List.of(input, new Trainee(null, null, null, null, "B.Two", null, true, null)));
         when(credentialsGenerator.generateUsername(any(), any())).thenReturn("A.One.1");
 
-        String result = credentialsService.generateUsername(new User(1L,"A","One",null,null,true));
+        String result = credentialsService.generateUsername(input);
 
         assertEquals("A.One.1", result);
         ArgumentCaptor<Set<String>> captor = ArgumentCaptor.forClass(Set.class);

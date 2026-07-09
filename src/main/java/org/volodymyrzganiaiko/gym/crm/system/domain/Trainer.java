@@ -1,6 +1,5 @@
 package org.volodymyrzganiaiko.gym.crm.system.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,6 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Trainer extends User {
     @ManyToOne
     @JoinColumn(name = "training_type_id")
@@ -24,7 +22,7 @@ public class Trainer extends User {
     private Set<Trainee> trainees = new HashSet<>();
 
     public Trainer(TrainingType specialization, String firstName, String lastName, String username, String password, Boolean isActive, Set<Trainee> trainees) {
-        super(null, firstName, lastName, username, password, isActive);
+        super(firstName, lastName, username, password, isActive);
         this.specialization = specialization;
         this.trainees = trainees;
     }

@@ -1,6 +1,5 @@
 package org.volodymyrzganiaiko.gym.crm.system.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +15,6 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Trainee extends User {
     @Past
     @Column(name = "date_of_birth")
@@ -35,7 +33,7 @@ public class Trainee extends User {
 
 
     public Trainee(LocalDate dateOfBirth, String address, String firstName, String lastName, String username, String password, Boolean isActive, Set<Trainer> trainers) {
-        super(null, firstName, lastName, username, password, isActive);
+        super(firstName, lastName, username, password, isActive);
         this.dateOfBirth = dateOfBirth;
         this.address = address;
         this.trainers = trainers;

@@ -24,15 +24,27 @@ public class GymFacade {
     private final TrainingTypeService trainingTypeService;
     private final AuthenticationService authenticationService;
     private final CredentialsService credentialsService;
+    private final UserService userService;
 
     @Autowired
-    public GymFacade(TraineeService traineeService, TrainerService trainerService, TrainingService trainingService, TrainingTypeService trainingTypeService, AuthenticationService authenticationService, CredentialsService credentialsService) {
+    public GymFacade(TraineeService traineeService, TrainerService trainerService, TrainingService trainingService, TrainingTypeService trainingTypeService, AuthenticationService authenticationService, CredentialsService credentialsService, UserService userService) {
         this.traineeService = traineeService;
         this.trainerService = trainerService;
         this.trainingService = trainingService;
         this.trainingTypeService = trainingTypeService;
         this.authenticationService = authenticationService;
         this.credentialsService = credentialsService;
+        this.userService = userService;
+    }
+
+    public void login(Credentials credentials) {
+        authenticationService.check(credentials);
+    }
+
+    @Transactional
+    public void changeLogin(Credentials credentials, String newPassword) {
+        authenticationService.check(credentials);
+        userService.changePassword(credentials.username(), newPassword);
     }
 
     @Transactional

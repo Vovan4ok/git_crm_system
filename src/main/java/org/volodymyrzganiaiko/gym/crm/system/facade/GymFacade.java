@@ -89,6 +89,18 @@ public class GymFacade {
         return mapper.mapTrainerToTrainerProfileResponse(trainer);
     }
 
+    @Transactional
+    public List<TrainerSummaryResponse> getUnassignedTrainers(Credentials credentials, String username) {
+        authenticationService.check(credentials);
+        return trainerService.getUnassignedTrainers(username).stream().map(mapper::mapTrainerToTrainerSummaryResponse).toList();
+    }
+
+    @Transactional
+    public List<TrainerSummaryResponse> updateTrainers(Credentials credentials, String username, List<String> trainerUsernames) {
+        authenticationService.check(credentials);
+        return traineeService.updateTrainerList(username, trainerUsernames).stream().map(mapper::mapTrainerToTrainerSummaryResponse).toList();
+    }
+
     public Optional<Trainee> findTraineeById(Long id) {
         return traineeService.findById(id);
     }

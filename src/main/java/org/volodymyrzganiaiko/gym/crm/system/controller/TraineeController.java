@@ -9,6 +9,7 @@ import org.volodymyrzganiaiko.gym.crm.system.facade.GymFacade;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/trainees")
@@ -37,6 +38,16 @@ public class TraineeController {
     public ResponseEntity<Void> deleteProfile(@PathVariable String username, @RequestHeader("X-Username") String authUser, @RequestHeader("X-Password") String authPass) {
         gymFacade.deleteTraineeProfile(new Credentials(authUser, authPass), username);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{username}/unassigned-trainers")
+    public ResponseEntity<List<TrainerSummaryResponse>> getUnassignedTrainers(@PathVariable String username, @RequestHeader("X-Username") String authUser, @RequestHeader("X-Password") String authPass) {
+        return ResponseEntity.ok(gymFacade.getUnassignedTrainers(new Credentials(authUser, authPass), username));
+    }
+
+    @PutMapping("/{username}/trainers")
+    public ResponseEntity<List<TrainerSummaryResponse>> updateTrainers(@PathVariable String username, @RequestHeader("X-Username") String authUser, @RequestHeader("X-Password") String authPass, @Valid @RequestBody UpdateTrainerListRequest req) {
+        return ResponseEntity.ok(gymFacade.updateTrainers(new Credentials(authUser, authPass), username, req.usernames()));
     }
 
     private Trainee mapTrainee(String firstName, String lastName, Boolean isActive, LocalDate dateOfBirth, String address) {

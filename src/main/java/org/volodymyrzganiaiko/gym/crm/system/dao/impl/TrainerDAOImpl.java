@@ -54,7 +54,7 @@ public class TrainerDAOImpl implements TrainerDAO {
     public List<Trainer> findUnassignedTrainers(String traineeUsername) {
         Session session = sessionFactory.getCurrentSession();
         return session.createQuery(
-                "select t from Trainer t where t.id not in " +
+                "select t from Trainer t where t.isActive = true and t.id not in " +
                         "(select tr.id from Trainee e join e.trainers tr where e.username = :username)",
                 Trainer.class).setParameter("username", traineeUsername).list();
     }

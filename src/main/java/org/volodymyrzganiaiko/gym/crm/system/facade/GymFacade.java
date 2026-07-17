@@ -8,8 +8,10 @@ import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Training;
 import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
 import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
+import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeProfileResponse;
 import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
 import org.volodymyrzganiaiko.gym.crm.system.dto.TrainerRegistrationDTO;
+import org.volodymyrzganiaiko.gym.crm.system.mapper.DtoMapper;
 import org.volodymyrzganiaiko.gym.crm.system.service.*;
 
 import java.time.LocalDate;
@@ -25,9 +27,10 @@ public class GymFacade {
     private final AuthenticationService authenticationService;
     private final CredentialsService credentialsService;
     private final UserService userService;
+    private final DtoMapper mapper;
 
     @Autowired
-    public GymFacade(TraineeService traineeService, TrainerService trainerService, TrainingService trainingService, TrainingTypeService trainingTypeService, AuthenticationService authenticationService, CredentialsService credentialsService, UserService userService) {
+    public GymFacade(TraineeService traineeService, TrainerService trainerService, TrainingService trainingService, TrainingTypeService trainingTypeService, AuthenticationService authenticationService, CredentialsService credentialsService, UserService userService, DtoMapper mapper) {
         this.traineeService = traineeService;
         this.trainerService = trainerService;
         this.trainingService = trainingService;
@@ -35,6 +38,7 @@ public class GymFacade {
         this.authenticationService = authenticationService;
         this.credentialsService = credentialsService;
         this.userService = userService;
+        this.mapper = mapper;
     }
 
     public void login(Credentials credentials) {
@@ -47,11 +51,25 @@ public class GymFacade {
         userService.changePassword(credentials.username(), newPassword);
     }
 
+    @Transactional(readOnly = true)
+    public TraineeProfileResponse getTraineeProfile(Credentials credentials, String username) {
+        authenticationService.check(credentials);
+        Trainee trainee = traineeService.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Trainee with the username " + username + " was not found"));
+        return mapper.mapTraineeToTraineeProfileResponse(trainee);
+    }
+
     @Transactional
     public TraineeRegistrationDTO createTrainee(Trainee trainee) {
         String rawPassword = credentialsService.assignCredentials(trainee);
         Trainee saved = traineeService.create(trainee);
         return new TraineeRegistrationDTO(saved.getUsername(), rawPassword);
+    }
+
+    @Transactional
+    public TraineeProfileResponse updateTraineeProfile(Credentials credentials, String username, Trainee data) {
+        authenticationService.check(credentials);
+        Trainee trainee = traineeService.update(username, data.getFirstName(), data.getLastName(), data.getIsActive(), data.getDateOfBirth(), data.getAddress());
+        return mapper.mapTraineeToTraineeProfileResponse(trainee);
     }
 
     public Optional<Trainee> findTraineeById(Long id) {
@@ -70,7 +88,7 @@ public class GymFacade {
 
     public Trainee updateTrainee(Credentials credentials, Trainee trainee) {
         authenticationService.check(credentials);
-        return traineeService.update(credentials.username(), trainee.getFirstName(), trainee.getLastName(), trainee.getDateOfBirth(), trainee.getAddress());
+        return traineeService.update(credentials.username(), trainee.getFirstName(), trainee.getLastName(), trainee.getIsActive(), trainee.getDateOfBirth(), trainee.getAddress());
     }
 
     public void activateTrainee(Credentials credentials) {

@@ -97,10 +97,11 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public Trainee update(String username, String newFirstName, String newLastName, LocalDate newDateOfBirth, String newAddress) {
+    public Trainee update(String username, String newFirstName, String newLastName, Boolean newIsActive, LocalDate newDateOfBirth, String newAddress) {
         Trainee foundTrainee = getByUsernameOrThrow(username);
         foundTrainee.setFirstName(newFirstName);
         foundTrainee.setLastName(newLastName);
+        foundTrainee.setIsActive(newIsActive);
         foundTrainee.setDateOfBirth(newDateOfBirth);
         foundTrainee.setAddress(newAddress);
         Set<ConstraintViolation<Trainee>> violations = validator.validate(foundTrainee);

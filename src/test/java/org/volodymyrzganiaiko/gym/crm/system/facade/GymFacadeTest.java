@@ -89,12 +89,12 @@ class GymFacadeTest {
 
     @Test
     void updateTrainee() {
-        when(traineeService.update(any(), any(), any(), any(), any())).thenReturn(new Trainee());
+        when(traineeService.update(any(), any(), any(), any(), any(), any())).thenReturn(new Trainee());
 
         Trainee result = gymFacade.updateTrainee(new Credentials("John.Doe", "pass"), new Trainee());
 
         assertNotNull(result);
-        verify(traineeService).update("John.Doe", null, null, null, null);
+        verify(traineeService).update("John.Doe", null, null, null, null, null);
     }
 
     @Test

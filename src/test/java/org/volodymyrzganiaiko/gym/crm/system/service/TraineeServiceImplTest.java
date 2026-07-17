@@ -105,7 +105,7 @@ public class TraineeServiceImplTest {
         trainee.setFirstName("Test");
         trainee.setLastName("Test");
 
-        Trainee result = traineeService.update(trainee.getUsername(), trainee.getFirstName(), trainee.getLastName(), trainee.getDateOfBirth(), trainee.getAddress());
+        Trainee result = traineeService.update(trainee.getUsername(), trainee.getFirstName(), trainee.getLastName(), trainee.getIsActive(), trainee.getDateOfBirth(), trainee.getAddress());
 
         assertTrue(result.getIsActive());
         assertEquals("Test", result.getFirstName());
@@ -120,7 +120,7 @@ public class TraineeServiceImplTest {
 
         trainee.setFirstName("");
 
-        assertThrows(ConstraintViolationException.class, () -> traineeService.update(trainee.getUsername(), trainee.getFirstName(), trainee.getLastName(), trainee.getDateOfBirth(), trainee.getAddress()));
+        assertThrows(ConstraintViolationException.class, () -> traineeService.update(trainee.getUsername(), trainee.getFirstName(), trainee.getLastName(), trainee.getIsActive(), trainee.getDateOfBirth(), trainee.getAddress()));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class TraineeServiceImplTest {
 
         trainee.setFirstName("Test");
 
-        assertThrows(IllegalArgumentException.class, () -> traineeService.update(trainee.getUsername(), trainee.getFirstName(), trainee.getLastName(), trainee.getDateOfBirth(), trainee.getAddress()));
+        assertThrows(IllegalArgumentException.class, () -> traineeService.update(trainee.getUsername(), trainee.getFirstName(), trainee.getLastName(), trainee.getIsActive(), trainee.getDateOfBirth(), trainee.getAddress()));
     }
 
     @Test

@@ -72,6 +72,12 @@ public class GymFacade {
         return mapper.mapTraineeToTraineeProfileResponse(trainee);
     }
 
+    @Transactional
+    public void deleteTraineeProfile(Credentials credentials, String username) {
+        authenticationService.check(credentials);
+        traineeService.deleteByUsername(username);
+    }
+
     public Optional<Trainee> findTraineeById(Long id) {
         return traineeService.findById(id);
     }

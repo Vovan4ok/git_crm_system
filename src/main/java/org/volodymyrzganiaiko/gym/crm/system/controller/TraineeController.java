@@ -33,6 +33,12 @@ public class TraineeController {
         return ResponseEntity.ok(gymFacade.updateTraineeProfile(new Credentials(authUser, authPass), username, trainee));
     }
 
+    @DeleteMapping("/{username}")
+    public ResponseEntity<Void> deleteProfile(@PathVariable String username, @RequestHeader("X-Username") String authUser, @RequestHeader("X-Password") String authPass) {
+        gymFacade.deleteTraineeProfile(new Credentials(authUser, authPass), username);
+        return ResponseEntity.ok().build();
+    }
+
     private Trainee mapTrainee(String firstName, String lastName, Boolean isActive, LocalDate dateOfBirth, String address) {
         Trainee trainee = new Trainee();
         trainee.setFirstName(firstName);

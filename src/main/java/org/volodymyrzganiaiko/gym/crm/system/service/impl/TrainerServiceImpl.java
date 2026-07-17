@@ -89,11 +89,11 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    public Trainer update(String username, String newFirstName, String newLastName, TrainingType newSpecialization) {
+    public Trainer update(String username, String newFirstName, String newLastName, Boolean isActive) {
         Trainer foundTrainer = getByUsernameOrThrow(username);
         foundTrainer.setFirstName(newFirstName);
         foundTrainer.setLastName(newLastName);
-        foundTrainer.setSpecialization(resolveSpecialization(newSpecialization));
+        foundTrainer.setIsActive(isActive);
         Set<ConstraintViolation<Trainer>> violations = validator.validate(foundTrainer);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);

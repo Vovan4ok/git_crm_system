@@ -108,12 +108,11 @@ public class TrainerServiceImplTest {
     @Test
     public void update_updatesTrainer_success() {
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
-        when(trainingTypeDAO.findById(1L)).thenReturn(Optional.of(new TrainingType(1L, "Yoga")));
 
         trainer.setFirstName("Test");
         trainer.setLastName("Test");
 
-        Trainer result = trainerService.update(trainer.getUsername(), trainer.getFirstName(), trainer.getLastName(), trainer.getSpecialization());
+        Trainer result = trainerService.update(trainer.getUsername(), trainer.getFirstName(), trainer.getLastName(), trainer.getIsActive());
 
         assertTrue(result.getIsActive());
         assertEquals("Test", result.getFirstName());
@@ -121,22 +120,12 @@ public class TrainerServiceImplTest {
     }
 
     @Test
-    public void update_throwsException() {
-        when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
-        when(trainingTypeDAO.findById(99L)).thenReturn(Optional.empty());
-
-        trainer.setSpecialization(new TrainingType(99L, "Cross-fit"));
-        assertThrows(IllegalArgumentException.class, () -> trainerService.update(trainer.getUsername(), trainer.getFirstName(), trainer.getLastName(), trainer.getSpecialization()));
-    }
-
-    @Test
     public void update_blankFirstName_throwsException() {
         when(trainerDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainer));
-        when(trainingTypeDAO.findById(1L)).thenReturn(Optional.of(new TrainingType(1L, "Yoga")));
 
         trainer.setFirstName("");
 
-        assertThrows(ConstraintViolationException.class, () -> trainerService.update(trainer.getUsername(), trainer.getFirstName(), trainer.getLastName(), trainer.getSpecialization()));
+        assertThrows(ConstraintViolationException.class, () -> trainerService.update(trainer.getUsername(), trainer.getFirstName(), trainer.getLastName(), trainer.getIsActive()));
     }
 
     @Test
@@ -145,7 +134,7 @@ public class TrainerServiceImplTest {
 
         trainer.setFirstName("Test");
 
-        assertThrows(IllegalArgumentException.class, () -> trainerService.update(trainer.getUsername(), trainer.getFirstName(), trainer.getLastName(), trainer.getSpecialization()));
+        assertThrows(IllegalArgumentException.class, () -> trainerService.update(trainer.getUsername(), trainer.getFirstName(), trainer.getLastName(), trainer.getIsActive()));
     }
 
     @Test

@@ -7,10 +7,7 @@ import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Training;
 import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
-import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
-import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeProfileResponse;
-import org.volodymyrzganiaiko.gym.crm.system.dto.TraineeRegistrationDTO;
-import org.volodymyrzganiaiko.gym.crm.system.dto.TrainerRegistrationDTO;
+import org.volodymyrzganiaiko.gym.crm.system.dto.*;
 import org.volodymyrzganiaiko.gym.crm.system.mapper.DtoMapper;
 import org.volodymyrzganiaiko.gym.crm.system.service.*;
 
@@ -76,6 +73,20 @@ public class GymFacade {
     public void deleteTraineeProfile(Credentials credentials, String username) {
         authenticationService.check(credentials);
         traineeService.deleteByUsername(username);
+    }
+
+    @Transactional
+    public TrainerProfileResponse getTrainerProfile(Credentials credentials, String username) {
+        authenticationService.check(credentials);
+        Trainer trainer = trainerService.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Trainer with the username " + username + " was not found"));
+        return mapper.mapTrainerToTrainerProfileResponse(trainer);
+    }
+
+    @Transactional
+    public TrainerProfileResponse updateTrainerProfile(Credentials credentials, String username, Trainer data) {
+        authenticationService.check(credentials);
+        Trainer trainer = trainerService.update(username, data.getFirstName(), data.getLastName(), data.getIsActive());
+        return mapper.mapTrainerToTrainerProfileResponse(trainer);
     }
 
     public Optional<Trainee> findTraineeById(Long id) {
@@ -144,7 +155,7 @@ public class GymFacade {
 
     public Trainer updateTrainer(Credentials credentials, Trainer trainer) {
         authenticationService.check(credentials);
-        return trainerService.update(credentials.username(), trainer.getFirstName(), trainer.getLastName(), trainer.getSpecialization());
+        return trainerService.update(credentials.username(), trainer.getFirstName(), trainer.getLastName(), trainer.getIsActive());
     }
 
     public void activateTrainer(Credentials credentials) {

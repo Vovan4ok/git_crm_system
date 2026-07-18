@@ -30,6 +30,10 @@ public class DtoMapper {
         return new TraineeTrainingResponse(training.getTrainingName(), training.getTrainingDate(), mapTrainingTypeToTrainingTypeResponse(training.getTrainingType()), training.getTrainingDurationInMinutes(), training.getTrainer().getUsername());
     }
 
+    public TrainerTrainingResponse mapTrainingToTrainerTrainingResponse(Training training) {
+        return new TrainerTrainingResponse(training.getTrainingName(), training.getTrainingDate(), mapTrainingTypeToTrainingTypeResponse(training.getTrainingType()), training.getTrainingDurationInMinutes(), training.getTrainee().getUsername());
+    }
+
     public TrainerProfileResponse mapTrainerToTrainerProfileResponse(Trainer trainer) {
         return new TrainerProfileResponse(trainer.getUsername(), trainer.getFirstName(), trainer.getLastName(), mapTrainingTypeToTrainingTypeResponse(trainer.getSpecialization()), trainer.getIsActive(), trainer.getTrainees().stream().map(this::mapTraineeToTraineeSummaryResponse).toList());
     }

@@ -122,6 +122,12 @@ public class GymFacade {
     }
 
     @Transactional
+    public List<TrainerTrainingResponse> getTrainerTrainings(Credentials credentials, String username, LocalDate from, LocalDate to, String traineeName) {
+        authenticationService.check(credentials);
+        return trainingService.getTrainerTrainings(username, from, to, traineeName).stream().map(mapper::mapTrainingToTrainerTrainingResponse).toList();
+    }
+
+    @Transactional
     public void createTraining(Credentials credentials, AddTrainingRequest req) {
         authenticationService.check(credentials);
         trainingService.addTraining(req.traineeUsername(), req.trainerUsername(), req.trainingName(), req.trainingDate(), req.trainingDuration());

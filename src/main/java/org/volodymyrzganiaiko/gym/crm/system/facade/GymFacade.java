@@ -76,6 +76,13 @@ public class GymFacade {
     }
 
     @Transactional
+    public void changeTraineeStatus(Credentials credentials, String username, Boolean isActive) {
+        authenticationService.check(credentials);
+        if (isActive) traineeService.activate(username);
+        else traineeService.deactivate(username);
+    }
+
+    @Transactional
     public TrainerProfileResponse getTrainerProfile(Credentials credentials, String username) {
         authenticationService.check(credentials);
         Trainer trainer = trainerService.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Trainer with the username " + username + " was not found"));
@@ -87,6 +94,13 @@ public class GymFacade {
         authenticationService.check(credentials);
         Trainer trainer = trainerService.update(username, data.getFirstName(), data.getLastName(), data.getIsActive());
         return mapper.mapTrainerToTrainerProfileResponse(trainer);
+    }
+
+    @Transactional
+    public void changeTrainerStatus(Credentials credentials, String username, Boolean isActive) {
+        authenticationService.check(credentials);
+        if (isActive) trainerService.activate(username);
+        else trainerService.deactivate(username);
     }
 
     @Transactional
@@ -105,6 +119,12 @@ public class GymFacade {
     public void createTraining(Credentials credentials, AddTrainingRequest req) {
         authenticationService.check(credentials);
         trainingService.addTraining(req.traineeUsername(), req.trainerUsername(), req.trainingName(), req.trainingDate(), req.trainingDuration());
+    }
+
+    @Transactional(readOnly = true)
+    public List<TrainingTypeResponse> getTrainingTypes(Credentials credentials) {
+        authenticationService.check(credentials);
+        return trainingTypeService.findAll().stream().map(mapper::mapTrainingTypeToTrainingTypeResponse).toList();
     }
 
     public Optional<Trainee> findTraineeById(Long id) {

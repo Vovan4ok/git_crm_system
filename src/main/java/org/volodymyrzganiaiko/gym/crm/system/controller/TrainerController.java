@@ -34,6 +34,12 @@ public class TrainerController {
         return ResponseEntity.ok(gymFacade.updateTrainerProfile(new Credentials(authUser, authPass), username, trainer));
     }
 
+    @PatchMapping("/{username}/status")
+    public ResponseEntity<Void> changeStatus(@PathVariable String username, @RequestHeader("X-Username") String authUser, @RequestHeader("X-Password") String authPass, @Valid @RequestBody UpdateStatusRequest req) {
+        gymFacade.changeTrainerStatus(new Credentials(authUser, authPass), username, req.isActive());
+        return ResponseEntity.ok().build();
+    }
+
     private Trainer mapTrainer(String firstName, String lastName, Boolean isActive, TrainingType specialization) {
         Trainer trainer = new Trainer();
         trainer.setFirstName(firstName);

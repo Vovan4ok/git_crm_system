@@ -8,6 +8,7 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.volodymyrzganiaiko.gym.crm.system.config.AppConfig;
+import org.volodymyrzganiaiko.gym.crm.system.config.SwaggerConfig;
 import org.volodymyrzganiaiko.gym.crm.system.config.WebConfig;
 import org.volodymyrzganiaiko.gym.crm.system.filter.TransactionIdFilter;
 
@@ -18,7 +19,7 @@ public class WebApplication {
     public static void main(String[] args) throws LifecycleException {
         Locale.setDefault(Locale.ENGLISH);
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-        context.register(WebConfig.class, AppConfig.class);
+        context.register(WebConfig.class, AppConfig.class, SwaggerConfig.class);
         Tomcat tomcat = new Tomcat();
         tomcat.setPort(8080);
         tomcat.setHostname("localhost");

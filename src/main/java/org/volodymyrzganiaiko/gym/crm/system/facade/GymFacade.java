@@ -83,6 +83,12 @@ public class GymFacade {
     }
 
     @Transactional
+    public List<TraineeTrainingResponse> getTraineeTrainings(Credentials credentials, String username, LocalDate from, LocalDate to, String trainerName, String trainingType) {
+        authenticationService.check(credentials);
+        return trainingService.getTraineeTrainings(username, from, to, trainerName, trainingType).stream().map(mapper::mapTrainingToTraineeTrainingResponse).toList();
+    }
+
+    @Transactional
     public TrainerProfileResponse getTrainerProfile(Credentials credentials, String username) {
         authenticationService.check(credentials);
         Trainer trainer = trainerService.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Trainer with the username " + username + " was not found"));

@@ -1,6 +1,7 @@
 package org.volodymyrzganiaiko.gym.crm.system.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
@@ -54,6 +55,11 @@ public class TraineeController {
     public ResponseEntity<Void> changeStatus(@PathVariable String username, @RequestHeader("X-Username") String authUser, @RequestHeader("X-Password") String authPass, @Valid @RequestBody UpdateStatusRequest req) {
         gymFacade.changeTraineeStatus(new Credentials(authUser, authPass), username, req.isActive());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{username}/trainings")
+    public ResponseEntity<List<TraineeTrainingResponse>> getTrainings(@PathVariable String username, @RequestHeader("X-Username") String authUser, @RequestHeader("X-Password") String authPass, @RequestParam(required = false, value = "periodFrom") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from, @RequestParam(required = false, value = "periodTo") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to, @RequestParam(required = false) String trainerName, @RequestParam(required = false) String trainingType) {
+        return ResponseEntity.ok(gymFacade.getTraineeTrainings(new Credentials(authUser, authPass), username, from, to, trainerName, trainingType));
     }
 
     private Trainee mapTrainee(String firstName, String lastName, Boolean isActive, LocalDate dateOfBirth, String address) {

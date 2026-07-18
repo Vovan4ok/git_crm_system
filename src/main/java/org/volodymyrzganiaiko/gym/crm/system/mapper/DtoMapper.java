@@ -3,6 +3,7 @@ package org.volodymyrzganiaiko.gym.crm.system.mapper;
 import org.springframework.stereotype.Component;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
+import org.volodymyrzganiaiko.gym.crm.system.domain.Training;
 import org.volodymyrzganiaiko.gym.crm.system.domain.TrainingType;
 import org.volodymyrzganiaiko.gym.crm.system.dto.*;
 
@@ -23,6 +24,10 @@ public class DtoMapper {
 
     public TraineeSummaryResponse mapTraineeToTraineeSummaryResponse(Trainee trainee) {
         return new TraineeSummaryResponse(trainee.getUsername(), trainee.getFirstName(), trainee.getLastName());
+    }
+
+    public TraineeTrainingResponse mapTrainingToTraineeTrainingResponse(Training training) {
+        return new TraineeTrainingResponse(training.getTrainingName(), training.getTrainingDate(), mapTrainingTypeToTrainingTypeResponse(training.getTrainingType()), training.getTrainingDurationInMinutes(), training.getTrainer().getUsername());
     }
 
     public TrainerProfileResponse mapTrainerToTrainerProfileResponse(Trainer trainer) {

@@ -101,6 +101,12 @@ public class GymFacade {
         return traineeService.updateTrainerList(username, trainerUsernames).stream().map(mapper::mapTrainerToTrainerSummaryResponse).toList();
     }
 
+    @Transactional
+    public void createTraining(Credentials credentials, AddTrainingRequest req) {
+        authenticationService.check(credentials);
+        trainingService.addTraining(req.traineeUsername(), req.trainerUsername(), req.trainingName(), req.trainingDate(), req.trainingDuration());
+    }
+
     public Optional<Trainee> findTraineeById(Long id) {
         return traineeService.findById(id);
     }

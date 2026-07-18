@@ -8,8 +8,11 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.volodymyrzganiaiko.gym.crm.system.config.AppConfig;
 import org.volodymyrzganiaiko.gym.crm.system.config.WebConfig;
 
+import java.util.Locale;
+
 public class WebApplication {
     public static void main(String[] args) throws LifecycleException {
+        Locale.setDefault(Locale.ENGLISH);
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
         context.register(WebConfig.class, AppConfig.class);
         Tomcat tomcat = new Tomcat();

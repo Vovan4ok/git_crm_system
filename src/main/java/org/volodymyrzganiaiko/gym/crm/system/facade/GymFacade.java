@@ -14,6 +14,7 @@ import org.volodymyrzganiaiko.gym.crm.system.service.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Component
 public class GymFacade {
@@ -59,19 +60,11 @@ public class GymFacade {
     }
 
     public TraineeRegistrationDTO createTrainee(Trainee trainee) {
-        for (int i = 1; i <= MAX_REGISTRATION_ATTEMPTS; i++) {
-            try {
-                String rawPassword = credentialsService.assignCredentials(trainee);
-                Trainee saved = traineeService.create(trainee);
-                return new TraineeRegistrationDTO(saved.getUsername(), rawPassword);
-            } catch (DataIntegrityViolationException e) {
-                log.warn("{} attempt of trainee registration was unsuccessful", i);
-                if (i == MAX_REGISTRATION_ATTEMPTS) {
-                    throw new IllegalStateException("Trainee creation failed after " + MAX_REGISTRATION_ATTEMPTS + " attempts", e);
-                }
-            }
-        }
-        throw new IllegalStateException("Unreachable");
+        return registerWithRetry("Trainee", () -> {
+            String rawPassword = credentialsService.assignCredentials(trainee);
+            Trainee saved = traineeService.create(trainee);
+            return new TraineeRegistrationDTO(saved.getUsername(), rawPassword);
+        });
     }
 
     @Transactional
@@ -152,15 +145,21 @@ public class GymFacade {
     }
 
     public TrainerRegistrationDTO createTrainer(Trainer trainer) {
+        return registerWithRetry("Trainer", () -> {
+            String rawPassword = credentialsService.assignCredentials(trainer);
+            Trainer saved = trainerService.create(trainer);
+            return new TrainerRegistrationDTO(saved.getUsername(), rawPassword);
+        });
+    }
+
+    private <R> R registerWithRetry(String role, Supplier<R> registration) {
         for (int i = 1; i <= MAX_REGISTRATION_ATTEMPTS; i++) {
             try {
-                String rawPassword = credentialsService.assignCredentials(trainer);
-                Trainer saved = trainerService.create(trainer);
-                return new TrainerRegistrationDTO(saved.getUsername(), rawPassword);
+                return registration.get();
             } catch (DataIntegrityViolationException e) {
-                log.warn("{} attempt of trainer registration was unsuccessful", i);
+                log.warn("{} attempt of {} registration was unsuccessful", i, role.toLowerCase());
                 if (i == MAX_REGISTRATION_ATTEMPTS) {
-                    throw new IllegalStateException("Trainer creation failed after " + MAX_REGISTRATION_ATTEMPTS + " attempts", e);
+                    throw new IllegalStateException(role + " creation failed after " + MAX_REGISTRATION_ATTEMPTS + " attempts", e);
                 }
             }
         }

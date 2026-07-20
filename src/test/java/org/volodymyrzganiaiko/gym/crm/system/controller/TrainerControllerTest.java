@@ -102,7 +102,7 @@ public class TrainerControllerTest {
         mockMvc.perform(post("/api/trainers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value("John.Doe"))
                 .andExpect(jsonPath("$.password").value("generatedPass"));
 

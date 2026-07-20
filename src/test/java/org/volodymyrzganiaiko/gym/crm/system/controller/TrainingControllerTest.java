@@ -59,7 +59,7 @@ public class TrainingControllerTest {
                         .header("X-Password", "random")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         ArgumentCaptor<Credentials> credentialsCaptor = ArgumentCaptor.forClass(Credentials.class);
         ArgumentCaptor<AddTrainingRequest> requestCaptor = ArgumentCaptor.forClass(AddTrainingRequest.class);

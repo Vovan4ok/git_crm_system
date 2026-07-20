@@ -53,7 +53,7 @@ public class TraineeControllerTest {
     }
 
     @Test
-    public void registerTrainee_success() throws Exception {
+    public void createTrainee_success() throws Exception {
         when(gymFacade.createTrainee(any(Trainee.class)))
                 .thenReturn(new TraineeRegistrationDTO("John.Doe", "generatedPass"));
 
@@ -64,7 +64,7 @@ public class TraineeControllerTest {
         mockMvc.perform(post("/api/trainees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value("John.Doe"))
                 .andExpect(jsonPath("$.password").value("generatedPass"));
 

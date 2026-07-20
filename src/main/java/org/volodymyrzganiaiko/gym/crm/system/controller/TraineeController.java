@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
@@ -27,11 +28,12 @@ public class TraineeController {
     @PostMapping
     @ApiOperation(value = "Register a trainee", notes = "Creates a trainee and returns the generated username together with the generated password. No authentication is required.")
     @ApiResponses({
+            @ApiResponse(code = 201, message = "Trainee was successfully created"),
             @ApiResponse(code = 400, message = "The request body failed validation")
     })
-    public ResponseEntity<TraineeRegistrationDTO> registerTrainee(@Valid @RequestBody TraineeRegistrationRequest  req) {
+    public ResponseEntity<TraineeRegistrationDTO> createTrainee(@Valid @RequestBody TraineeRegistrationRequest  req) {
         Trainee trainee = mapTrainee(req.firstName(), req.lastName(), null, req.dateOfBirth(), req.address());
-        return ResponseEntity.ok(gymFacade.createTrainee(trainee));
+        return ResponseEntity.status(HttpStatus.CREATED).body(gymFacade.createTrainee(trainee));
     }
 
     @GetMapping("/{username}")

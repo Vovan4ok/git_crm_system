@@ -29,12 +29,13 @@ public class TrainerController {
     @PostMapping
     @ApiOperation(value = "Register a trainer", notes = "Creates a trainer and returns the generated username together with the generated password. No authentication is required.")
     @ApiResponses({
+            @ApiResponse(code = 201, message = "Trainer was successfully created"),
             @ApiResponse(code = 400, message = "The request body failed validation"),
             @ApiResponse(code = 404, message = "The specialization was not found")
     })
     public ResponseEntity<TrainerRegistrationDTO> createTrainer(@Valid @RequestBody TrainerRegistrationRequest req) {
         Trainer trainer = mapTrainer(req.firstName(), req.lastName(), null, new TrainingType(req.specializationId(), null));
-        return new ResponseEntity<>(gymFacade.createTrainer(trainer),  HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.CREATED).body(gymFacade.createTrainer(trainer));
     }
 
     @GetMapping("/{username}")

@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.volodymyrzganiaiko.gym.crm.system.dao.UserDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.User;
 import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
-import org.volodymyrzganiaiko.gym.crm.system.exceptions.AuthenticationException;
+import org.volodymyrzganiaiko.gym.crm.system.exception.AuthenticationException;
 
 import java.util.Optional;
 

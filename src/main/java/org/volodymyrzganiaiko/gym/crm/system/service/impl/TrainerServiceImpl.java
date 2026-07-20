@@ -80,20 +80,11 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    public void changePassword(String username, String newPassword) {
-        Trainer trainer = getByUsernameOrThrow(username);
-        requireNotBlank(newPassword, "password");
-        trainer.setPassword(passwordEncoder.encode(newPassword));
-        log.info("Changing the password for the trainer with username {}", username);
-    }
-
-    @Override
-    @Transactional
-    public Trainer update(String username, String newFirstName, String newLastName, TrainingType newSpecialization) {
+    public Trainer update(String username, String newFirstName, String newLastName, Boolean isActive) {
         Trainer foundTrainer = getByUsernameOrThrow(username);
         foundTrainer.setFirstName(newFirstName);
         foundTrainer.setLastName(newLastName);
-        foundTrainer.setSpecialization(resolveSpecialization(newSpecialization));
+        foundTrainer.setIsActive(isActive);
         Set<ConstraintViolation<Trainer>> violations = validator.validate(foundTrainer);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
@@ -106,11 +97,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     public void activate(String username) {
         Trainer foundTrainer = getByUsernameOrThrow(username);
-        if (foundTrainer.getIsActive()) {
-            log.warn("Trainer with the username {} is already active", username);
-            throw new IllegalStateException("Trainer with the username " + username + " is already active");
-        }
-        foundTrainer.setIsActive(true);
+        foundTrainer.changeStatus(true);
         log.info("Activating the trainer with username {}", username);
     }
 
@@ -118,11 +105,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     public void deactivate(String username) {
         Trainer foundTrainer = getByUsernameOrThrow(username);
-        if (!foundTrainer.getIsActive()) {
-            log.warn("Trainer with the username {} is already deactivated", username);
-            throw new IllegalStateException("Trainer with the username " + username + " is already inactive");
-        }
-        foundTrainer.setIsActive(false);
+        foundTrainer.changeStatus(false);
         log.info("Deactivating the trainer with username {}", username);
     }
 

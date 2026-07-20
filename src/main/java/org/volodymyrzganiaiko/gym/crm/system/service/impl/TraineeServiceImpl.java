@@ -88,19 +88,11 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public void changePassword(String username, String newPassword) {
-        Trainee trainee = getByUsernameOrThrow(username);
-        requireNotBlank(newPassword, "password");
-        trainee.setPassword(passwordEncoder.encode(newPassword));
-        log.info("Trainee with username {} is changing the password", username);
-    }
-
-    @Override
-    @Transactional
-    public Trainee update(String username, String newFirstName, String newLastName, LocalDate newDateOfBirth, String newAddress) {
+    public Trainee update(String username, String newFirstName, String newLastName, Boolean newIsActive, LocalDate newDateOfBirth, String newAddress) {
         Trainee foundTrainee = getByUsernameOrThrow(username);
         foundTrainee.setFirstName(newFirstName);
         foundTrainee.setLastName(newLastName);
+        foundTrainee.setIsActive(newIsActive);
         foundTrainee.setDateOfBirth(newDateOfBirth);
         foundTrainee.setAddress(newAddress);
         Set<ConstraintViolation<Trainee>> violations = validator.validate(foundTrainee);
@@ -115,11 +107,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public void activate(String username) {
         Trainee foundTrainee = getByUsernameOrThrow(username);
-        if (foundTrainee.getIsActive()) {
-            log.warn("Trainee with username {} is already active", username);
-            throw new IllegalStateException("Trainee with the username " + username + " is already active");
-        }
-        foundTrainee.setIsActive(true);
+        foundTrainee.changeStatus(true);
         log.info("Activating the trainee with username {}", username);
     }
 
@@ -127,11 +115,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public void deactivate(String username) {
         Trainee foundTrainee = getByUsernameOrThrow(username);
-        if (!foundTrainee.getIsActive()) {
-            log.warn("Trainee with username {} is already deactivated", username);
-            throw new IllegalStateException("Trainee with the username " + username + " is already inactive");
-        }
-        foundTrainee.setIsActive(false);
+        foundTrainee.changeStatus(false);
         log.info("Deactivating the trainee with username {}", username);
     }
 

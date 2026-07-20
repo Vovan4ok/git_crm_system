@@ -54,4 +54,22 @@ public class CredentialsServiceTest {
         assertEquals("secret1234", credentialsService.generatePassword());
         verify(credentialsGenerator).generatePassword();
     }
+
+    @Test
+    void assignCredentials_success() {
+        User user = new Trainee();
+        user.setIsActive(false);
+
+        when(userDAO.findAll()).thenReturn(List.of());
+        when(credentialsGenerator.generateUsername(any(), any())).thenReturn("John.Doe");
+        when(credentialsGenerator.generatePassword()).thenReturn("secret1234");
+        when(passwordEncoder.encode("secret1234")).thenReturn("secret1234Encoded");
+
+        String result = credentialsService.assignCredentials(user);
+        assertEquals("secret1234", result);
+        assertEquals("secret1234Encoded", user.getPassword());
+        assertNotEquals(result, user.getPassword());
+        assertEquals("John.Doe", user.getUsername());
+        assertTrue(user.getIsActive());
+    }
 }

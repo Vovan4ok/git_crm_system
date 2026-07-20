@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.volodymyrzganiaiko.gym.crm.system.dao.UserDAO;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.dto.Credentials;
-import org.volodymyrzganiaiko.gym.crm.system.exceptions.AuthenticationException;
+import org.volodymyrzganiaiko.gym.crm.system.exception.AuthenticationException;
 
 import java.time.LocalDate;
 import java.util.HashSet;

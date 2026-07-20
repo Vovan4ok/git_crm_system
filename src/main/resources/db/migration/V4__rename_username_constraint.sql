@@ -1,0 +1,1 @@
+alter table users rename constraint UK_r43af9ap4edm43mmtq01oddj6 to uk_users_username;

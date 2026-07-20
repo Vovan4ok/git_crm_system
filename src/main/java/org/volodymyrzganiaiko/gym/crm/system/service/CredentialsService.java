@@ -3,6 +3,7 @@ package org.volodymyrzganiaiko.gym.crm.system.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TraineeDAO;
 import org.volodymyrzganiaiko.gym.crm.system.dao.TrainerDAO;
 import org.volodymyrzganiaiko.gym.crm.system.dao.UserDAO;
@@ -43,6 +44,7 @@ public class CredentialsService {
         return credentialsGenerator.generatePassword();
     }
 
+    @Transactional(readOnly = true)
     public String assignCredentials(User user) {
         user.setIsActive(true);
         user.setUsername(generateUsername(user));

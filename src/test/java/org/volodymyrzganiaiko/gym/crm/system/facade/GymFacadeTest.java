@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.volodymyrzganiaiko.gym.crm.system.domain.*;
 import org.volodymyrzganiaiko.gym.crm.system.dto.*;
 import org.volodymyrzganiaiko.gym.crm.system.exception.AuthenticationException;
@@ -377,5 +378,69 @@ class GymFacadeTest {
 
         assertEquals(List.of(expected), result);
         verify(authenticationService).check(credentials);
+    }
+
+    @Test
+    public void createTrainee_retriesOnDuplicateUsername() {
+        Trainee input = new Trainee();
+        Trainee saved = new Trainee();
+        saved.setUsername("John.Doe1");
+
+        when(credentialsService.assignCredentials(any())).thenReturn("password");
+        when(traineeService.create(any()))
+                .thenThrow(new DataIntegrityViolationException("duplicate username"))
+                .thenReturn(saved);
+
+        TraineeRegistrationDTO result = gymFacade.createTrainee(input);
+
+        verify(traineeService, times(2)).create(any());
+        verify(credentialsService, times(2)).assignCredentials(any());
+        assertEquals("John.Doe1", result.username());
+        assertEquals("password", result.password());
+    }
+
+    @Test
+    public void createTrainee_failsAfterMaxAttempts() {
+        Trainee input = new Trainee();
+        when(credentialsService.assignCredentials(any())).thenReturn("password");
+        when(traineeService.create(any())).thenThrow(new DataIntegrityViolationException("duplicate username"));
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> gymFacade.createTrainee(input));
+
+        verify(traineeService, times(3)).create(any());
+        assertInstanceOf(DataIntegrityViolationException.class, ex.getCause());
+        assertTrue(ex.getMessage().contains("Trainee"));
+    }
+
+    @Test
+    public void createTrainer_retriesOnDuplicateUsername() {
+        Trainer input = new Trainer();
+        Trainer saved = new Trainer();
+        saved.setUsername("John.Doe1");
+
+        when(credentialsService.assignCredentials(any())).thenReturn("password");
+        when(trainerService.create(any()))
+                .thenThrow(new DataIntegrityViolationException("duplicate username"))
+                .thenReturn(saved);
+
+        TrainerRegistrationDTO result = gymFacade.createTrainer(input);
+
+        verify(trainerService, times(2)).create(any());
+        verify(credentialsService, times(2)).assignCredentials(any());
+        assertEquals("John.Doe1", result.username());
+        assertEquals("password", result.password());
+    }
+
+    @Test
+    public void createTrainer_failsAfterMaxAttempts() {
+        Trainer input = new Trainer();
+        when(credentialsService.assignCredentials(any())).thenReturn("password");
+        when(trainerService.create(any())).thenThrow(new DataIntegrityViolationException("duplicate username"));
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> gymFacade.createTrainer(input));
+
+        verify(trainerService, times(3)).create(any());
+        assertInstanceOf(DataIntegrityViolationException.class, ex.getCause());
+        assertTrue(ex.getMessage().contains("Trainer"));
     }
 }

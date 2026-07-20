@@ -1,6 +1,9 @@
 package org.volodymyrzganiaiko.gym.crm.system.facade;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
@@ -22,6 +25,9 @@ public class GymFacade {
     private final CredentialsService credentialsService;
     private final UserService userService;
     private final DtoMapper mapper;
+
+    private static final int MAX_REGISTRATION_ATTEMPTS = 3;
+    private static final Logger log =  LoggerFactory.getLogger(GymFacade.class);
 
     @Autowired
     public GymFacade(TraineeService traineeService, TrainerService trainerService, TrainingService trainingService, TrainingTypeService trainingTypeService, AuthenticationService authenticationService, CredentialsService credentialsService, UserService userService, DtoMapper mapper) {
@@ -52,11 +58,20 @@ public class GymFacade {
         return mapper.mapTraineeToTraineeProfileResponse(trainee);
     }
 
-    @Transactional
     public TraineeRegistrationDTO createTrainee(Trainee trainee) {
-        String rawPassword = credentialsService.assignCredentials(trainee);
-        Trainee saved = traineeService.create(trainee);
-        return new TraineeRegistrationDTO(saved.getUsername(), rawPassword);
+        for (int i = 1; i <= MAX_REGISTRATION_ATTEMPTS; i++) {
+            try {
+                String rawPassword = credentialsService.assignCredentials(trainee);
+                Trainee saved = traineeService.create(trainee);
+                return new TraineeRegistrationDTO(saved.getUsername(), rawPassword);
+            } catch (DataIntegrityViolationException e) {
+                log.warn("{} attempt of trainee registration was unsuccessful", i);
+                if (i == MAX_REGISTRATION_ATTEMPTS) {
+                    throw new IllegalStateException("Trainee creation failed after " + MAX_REGISTRATION_ATTEMPTS + " attempts", e);
+                }
+            }
+        }
+        throw new IllegalStateException("Unreachable");
     }
 
     @Transactional
@@ -136,10 +151,19 @@ public class GymFacade {
         return trainingTypeService.findAll().stream().map(mapper::mapTrainingTypeToTrainingTypeResponse).toList();
     }
 
-    @Transactional
     public TrainerRegistrationDTO createTrainer(Trainer trainer) {
-        String rawPassword = credentialsService.assignCredentials(trainer);
-        Trainer saved = trainerService.create(trainer);
-        return new TrainerRegistrationDTO(saved.getUsername(), rawPassword);
+        for (int i = 1; i <= MAX_REGISTRATION_ATTEMPTS; i++) {
+            try {
+                String rawPassword = credentialsService.assignCredentials(trainer);
+                Trainer saved = trainerService.create(trainer);
+                return new TrainerRegistrationDTO(saved.getUsername(), rawPassword);
+            } catch (DataIntegrityViolationException e) {
+                log.warn("{} attempt of trainer registration was unsuccessful", i);
+                if (i == MAX_REGISTRATION_ATTEMPTS) {
+                    throw new IllegalStateException("Trainer creation failed after " + MAX_REGISTRATION_ATTEMPTS + " attempts", e);
+                }
+            }
+        }
+        throw new IllegalStateException("Unreachable");
     }
 }

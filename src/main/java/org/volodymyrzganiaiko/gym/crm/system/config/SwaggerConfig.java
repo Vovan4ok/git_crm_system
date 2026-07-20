@@ -19,6 +19,7 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
+                .useDefaultResponseMessages(false)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("org.volodymyrzganiaiko.gym.crm.system.controller"))
                 .paths(PathSelectors.any())

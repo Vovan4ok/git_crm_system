@@ -53,18 +53,6 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     @Transactional
-    public Training addTraining(Training training) {
-        Set<ConstraintViolation<Training>> violations = validator.validate(training);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
-        training = trainingDAO.save(training);
-        log.info("Creating the training record with id {}", training.getId());
-        return training;
-}
-
-    @Override
-    @Transactional
     public Training addTraining(String traineeUsername, String trainerUsername, String trainingName, LocalDate trainingDate, Integer durationInMinutes) {
         Trainee trainee = traineeDAO.findByUsername(traineeUsername).orElseThrow(() -> new IllegalArgumentException("Trainee with username " + traineeUsername + " was not found"));
         Trainer trainer = trainerDAO.findByUsername(trainerUsername).orElseThrow(() -> new IllegalArgumentException("Trainer with username " + trainerUsername + " was not found"));

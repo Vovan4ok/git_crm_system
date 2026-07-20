@@ -80,15 +80,6 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    public void changePassword(String username, String newPassword) {
-        Trainer trainer = getByUsernameOrThrow(username);
-        requireNotBlank(newPassword, "password");
-        trainer.setPassword(passwordEncoder.encode(newPassword));
-        log.info("Changing the password for the trainer with username {}", username);
-    }
-
-    @Override
-    @Transactional
     public Trainer update(String username, String newFirstName, String newLastName, Boolean isActive) {
         Trainer foundTrainer = getByUsernameOrThrow(username);
         foundTrainer.setFirstName(newFirstName);

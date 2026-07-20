@@ -3,9 +3,7 @@ package org.volodymyrzganiaiko.gym.crm.system.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -53,25 +51,6 @@ public class TrainingServiceImplTest {
         training.setTrainingType(new TrainingType(1L, "Yoga"));
         training.setTrainingName("Yoga");
         training.setTrainingDurationInMinutes(90);
-    }
-
-    @Test
-    public void addTraining_success() {
-        when(trainingDAO.save(any(Training.class))).thenReturn(training);
-
-        trainingService.addTraining(training);
-
-        verify(trainingDAO).save(training);
-    }
-
-    @ParameterizedTest(name = "invalid field: {0}")
-    @MethodSource("invalidTrainingMutators")
-    public void addTraining_throwsException(String caseName, Consumer<Training> corrupt) {
-        corrupt.accept(training);
-
-        assertThrows(ConstraintViolationException.class,
-                () -> trainingService.addTraining(training));
-        verifyNoInteractions(trainingDAO);
     }
 
     @Test

@@ -71,32 +71,6 @@ public class TraineeServiceImplTest {
     }
 
     @Test
-    public void changePassword_success() {
-        when(traineeDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainee));
-        when(passwordEncoder.encode("random1")).thenReturn("random1");
-
-        traineeService.changePassword("John.Doe", "random1");
-
-        assertEquals("random1", trainee.getPassword());
-    }
-
-    @Test
-    public void changePassword_throwsException() {
-        when(traineeDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainee));
-
-        assertThrows(IllegalArgumentException.class, () -> traineeService.changePassword("John.Doe", " "));
-        
-    }
-
-    @Test
-    public void changePassword_traineeNotFound_throwsException() {
-        when(traineeDAO.findByUsername(any(String.class))).thenReturn(Optional.empty());
-
-        assertThrows(IllegalArgumentException.class, () -> traineeService.changePassword("John.Doe", "randomPassword"));
-        
-    }
-
-    @Test
     public void update_updatesTrainee_success() {
         when(traineeDAO.findByUsername(any(String.class))).thenReturn(Optional.of(trainee));
 

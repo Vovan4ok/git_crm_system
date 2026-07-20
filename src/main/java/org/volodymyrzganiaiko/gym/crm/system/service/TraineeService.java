@@ -12,7 +12,6 @@ public interface TraineeService {
     Optional<Trainee> findById(Long id);
     Optional<Trainee> findByUsername(String username);
     List<Trainee> findAll();
-    void changePassword(String username, String newPassword);
     Trainee update(String username, String newFirstName, String newLastName, Boolean newIsActive, LocalDate newDateOfBirth, String newAddress);
     void activate(String username);
     void deactivate(String username);

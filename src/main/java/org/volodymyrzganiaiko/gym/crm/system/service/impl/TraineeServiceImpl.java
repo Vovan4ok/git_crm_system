@@ -88,15 +88,6 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public void changePassword(String username, String newPassword) {
-        Trainee trainee = getByUsernameOrThrow(username);
-        requireNotBlank(newPassword, "password");
-        trainee.setPassword(passwordEncoder.encode(newPassword));
-        log.info("Trainee with username {} is changing the password", username);
-    }
-
-    @Override
-    @Transactional
     public Trainee update(String username, String newFirstName, String newLastName, Boolean newIsActive, LocalDate newDateOfBirth, String newAddress) {
         Trainee foundTrainee = getByUsernameOrThrow(username);
         foundTrainee.setFirstName(newFirstName);

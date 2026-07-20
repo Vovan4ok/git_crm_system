@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TrainingService {
-    Training addTraining(Training training);
     Training addTraining(String traineeUsername, String trainerUsername, String trainingName, LocalDate trainingDate, Integer durationInMinutes);
     Optional<Training> findById(Long id);
     List<Training> getTraineeTrainings(String traineeUsername, LocalDate from, LocalDate to, String trainerUsername, String trainingTypeName);

@@ -1,5 +1,6 @@
 package org.volodymyrzganiaiko.gym.crm.system.mapper;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainee;
 import org.volodymyrzganiaiko.gym.crm.system.domain.Trainer;
@@ -11,18 +12,24 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DtoMapperTest {
     private final DtoMapper mapper = new DtoMapper();
 
-    private final TrainingType trainingType = new TrainingType(2L, "Cardio");
-    private final Trainer trainer = new Trainer(trainingType, "Jane", "Roe", "Jane.Roe", null, true, Set.of());
-    private final Trainee trainee = new Trainee(LocalDate.parse("2003-11-08"), "Test address", "John", "Doe", "John.Doe", "random", true, Set.of());
+    private TrainingType trainingType;
+    private Trainer trainer;
+    private Trainee trainee;
+
+    @BeforeEach
+    public void setUp() {
+        trainingType = new TrainingType(2L, "Cardio");
+        trainer = new Trainer(trainingType, "Jane", "Roe", "Jane.Roe", null, true, Set.of());
+        trainee = new Trainee(LocalDate.parse("2003-11-08"), "Test address", "John", "Doe", "John.Doe", null, true, Set.of());
+    }
 
     @Test
     public void mapTrainingTypeToTrainingTypeResponse_success() {
-        TrainingType trainingType = new TrainingType(2L, "Cardio");
-
         TrainingTypeResponse result = mapper.mapTrainingTypeToTrainingTypeResponse(trainingType);
 
         assertEquals(2L, result.id());
@@ -58,6 +65,7 @@ public class DtoMapperTest {
         assertEquals("John", result.firstName());
         assertEquals("Doe", result.lastName());
         assertEquals(LocalDate.of(2003, 11, 8), result.dateOfBirth());
+        assertTrue(result.isActive());
         assertEquals("Test address", result.address());
         assertEquals(1, result.trainers().size());
         assertEquals("Jane.Roe", result.trainers().get(0).username());

@@ -97,11 +97,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     public void activate(String username) {
         Trainer foundTrainer = getByUsernameOrThrow(username);
-        if (foundTrainer.getIsActive()) {
-            log.warn("Trainer with the username {} is already active", username);
-            throw new IllegalStateException("Trainer with the username " + username + " is already active");
-        }
-        foundTrainer.setIsActive(true);
+        foundTrainer.changeStatus(true);
         log.info("Activating the trainer with username {}", username);
     }
 
@@ -109,11 +105,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     public void deactivate(String username) {
         Trainer foundTrainer = getByUsernameOrThrow(username);
-        if (!foundTrainer.getIsActive()) {
-            log.warn("Trainer with the username {} is already deactivated", username);
-            throw new IllegalStateException("Trainer with the username " + username + " is already inactive");
-        }
-        foundTrainer.setIsActive(false);
+        foundTrainer.changeStatus(false);
         log.info("Deactivating the trainer with username {}", username);
     }
 

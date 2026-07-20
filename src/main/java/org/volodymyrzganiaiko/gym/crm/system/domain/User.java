@@ -49,6 +49,13 @@ public abstract class User {
         this.isActive = isActive;
     }
 
+    public void changeStatus(Boolean isActive) {
+        if (Objects.equals(this.isActive, isActive)) {
+            throw new IllegalStateException("User with username " + username + " is already " + (isActive ? "active" : "inactive"));
+        }
+        this.isActive = isActive;
+    }
+
     @Override
     public String toString() {
         return "User{" +

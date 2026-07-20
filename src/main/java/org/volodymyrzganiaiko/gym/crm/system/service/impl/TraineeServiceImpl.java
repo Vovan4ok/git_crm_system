@@ -107,11 +107,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public void activate(String username) {
         Trainee foundTrainee = getByUsernameOrThrow(username);
-        if (foundTrainee.getIsActive()) {
-            log.warn("Trainee with username {} is already active", username);
-            throw new IllegalStateException("Trainee with the username " + username + " is already active");
-        }
-        foundTrainee.setIsActive(true);
+        foundTrainee.changeStatus(true);
         log.info("Activating the trainee with username {}", username);
     }
 
@@ -119,11 +115,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public void deactivate(String username) {
         Trainee foundTrainee = getByUsernameOrThrow(username);
-        if (!foundTrainee.getIsActive()) {
-            log.warn("Trainee with username {} is already deactivated", username);
-            throw new IllegalStateException("Trainee with the username " + username + " is already inactive");
-        }
-        foundTrainee.setIsActive(false);
+        foundTrainee.changeStatus(false);
         log.info("Deactivating the trainee with username {}", username);
     }
 

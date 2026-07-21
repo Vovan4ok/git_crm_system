@@ -21,5 +21,13 @@ spring:
     locale: en
     locale-resolver: fixed
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    # Without this the UI ships with petstore.swagger.io hard-coded as its spec URL
+    disable-swagger-default-url: true
+
 server:
   port: 8080

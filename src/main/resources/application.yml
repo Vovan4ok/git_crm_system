@@ -1,18 +1,9 @@
 spring:
   application:
     name: gym-crm-system
-  datasource:
-    url: jdbc:postgresql://localhost:5432/gym_crm
-    username: gym_user
-    password: gym_pass
-    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
-    properties:
-      hibernate:
-        format_sql: true
-    show-sql: true
     open-in-view: false
   flyway:
     enabled: true
@@ -20,6 +11,8 @@ spring:
   web:
     locale: en
     locale-resolver: fixed
+  profiles:
+    active: local
 
 springdoc:
   api-docs:
